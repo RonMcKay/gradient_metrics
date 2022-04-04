@@ -31,7 +31,7 @@ class PNorm(GradientMetric):
             raise ValueError(f"eps has to be greater than zero, got {eps}")
         self.eps = eps
 
-        self.metric_buffer = None
+        self.metric_buffer: torch.Tensor
         self.reset()
 
     def _collect(self, grad: torch.Tensor) -> None:
@@ -53,7 +53,7 @@ class PNorm(GradientMetric):
 class Min(GradientMetric):
     def __init__(self) -> None:
         super().__init__()
-        self.metric_buffer = None
+        self.metric_buffer: torch.Tensor
         self.reset()
 
     def _collect(self, grad: torch.Tensor) -> None:
@@ -71,7 +71,7 @@ class Min(GradientMetric):
 class Max(GradientMetric):
     def __init__(self) -> None:
         super().__init__()
-        self.metric_buffer = None
+        self.metric_buffer: torch.Tensor
         self.reset()
 
     def _collect(self, grad: torch.Tensor) -> None:
@@ -89,8 +89,8 @@ class Max(GradientMetric):
 class Mean(GradientMetric):
     def __init__(self) -> None:
         super().__init__()
-        self.metric_buffer = None
-        self.count = None
+        self.metric_buffer: torch.Tensor
+        self.count: int
         self.reset()
 
     def _collect(self, grad: torch.Tensor) -> None:
@@ -126,9 +126,9 @@ class MeanStd(GradientMetric):
 
         self.return_mean = return_mean
 
-        self.mean: torch.Tensor = None
-        self.m2: torch.Tensor = None
-        self.count: int = None
+        self.mean: torch.Tensor
+        self.m2: torch.Tensor
+        self.count: int
         self.reset()
 
     def _collect(self, grad: torch.Tensor) -> None:

@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import List, Sequence, Type, Union
 
 from gradient_metrics.metrics import GradientMetric
@@ -13,21 +12,22 @@ class GradientMetricCollector(object):
             Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
         ],
         metrics: Union[Sequence[Type[GradientMetric]], Type[GradientMetric]],
-    ):
-        if not isinstance(target_layers, (list, tuple)):
-            target_layers = (target_layers,)
-        self.target_layers = target_layers
+    ) -> None:
+        self.target_layers = (
+            (target_layers,)
+            if isinstance(target_layers, (nn.Module, torch.Tensor))
+            else tuple(target_layers)
+        )
 
-        if not isinstance(metrics, (list, tuple)):
-            metrics = (metrics,)
-        self.metrics = metrics
+        self.metrics = (
+            tuple(metrics) if isinstance(metrics, (list, tuple)) else (metrics,)
+        )
 
-        self.parameter_metric_map = OrderedDict()
         self.metric_collection: List[GradientMetric] = []
 
         self._register_metrics()
 
-    def __call__(self, loss: torch.Tensor, create_graph: bool = False):
+    def __call__(self, loss: torch.Tensor, create_graph: bool = False) -> torch.Tensor:
         if not loss.requires_grad:
             raise ValueError(
                 "'loss' should require grad in order to extract gradient metrics."
@@ -43,19 +43,16 @@ class GradientMetricCollector(object):
 
             metrics.append(self.get_metrics())
 
-        metrics = torch.stack(metrics).to(loss.device)
+        return torch.stack(metrics).to(loss.device)
 
-        return metrics
-
-    def get_metrics(self, keep_buffer=False) -> torch.Tensor:
+    def get_metrics(self, keep_buffer: bool = False) -> torch.Tensor:
         metrics = []
         for m in self.metric_collection:
             metrics.append(m.data)
             if not keep_buffer:
                 m.reset()
 
-        metrics = torch.cat(metrics)
-        return metrics
+        return torch.cat(metrics)
 
     def reset(self) -> None:
         for m in self.metric_collection:
@@ -65,16 +62,16 @@ class GradientMetricCollector(object):
     def dim(self) -> int:
         return self.get_metrics(keep_buffer=True).shape[0]
 
-    def _register_metrics(self):
+    def _register_metrics(self) -> None:
         for t in self.target_layers:
             if isinstance(t, torch.Tensor):
                 for m in self.metrics:
                     current_metric = m()
-                    t.register_hook(current_metric)
+                    t.register_hook(current_metric)  # type: ignore
                     self.metric_collection.append(current_metric)
             else:
                 for m in self.metrics:
                     current_metric = m()
                     self.metric_collection.append(current_metric)
                     for param in t.parameters():
-                        param.register_hook(current_metric)
+                        param.register_hook(current_metric)  # type: ignore
