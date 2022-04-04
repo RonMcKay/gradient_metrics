@@ -1,0 +1,36 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Publish to Test-PyPI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+      - name: Install Poetry
+        run: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
+      - name: Add Poetry to path
+        run: echo "${HOME}/.poetry/bin" >> $GITHUB_PATH
+      - name: Install venv
+        run: poetry install
+      - run: poetry config repositories.testpypi https://test.pypi.org/legacy/
+      - run: poetry config pypi-token.testpypi ${{ secrets.TEST_PYPI_API_KEY }}
+      - name: Publish package
+        run: poetry publish --build -r testpypi
