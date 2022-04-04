@@ -27,9 +27,6 @@ jobs:
       - name: Install venv
         run: poetry install
 
-      - name: Run Tests with pytest
-        run: poetry run pytest --cov=gradient_metrics/ --cov-report=term-missing --cov-fail-under=90 tests
-
       - name: Lint with flake8
         run: |
           # stop the action if there are syntax errors or undefined variables
@@ -39,6 +36,9 @@ jobs:
 
       - name: Run mypy
         run: poetry run mypy gradient_metrics
+
+      - name: Run Tests with pytest
+        run: poetry run pytest --cov=gradient_metrics/ --cov-report=term-missing --cov-fail-under=90 tests
 
       - name: Build the package
         run: poetry build
