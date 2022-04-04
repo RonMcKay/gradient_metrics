@@ -10,14 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v3
         with:
           python-version: 3.8
+
       - name: Install Poetry
         run: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
+
       - name: Add Poetry to path
         run: echo "${HOME}/.poetry/bin" >> $GITHUB_PATH
+
       - name: Install venv
         run: poetry install
-      - name: Test
+
+      - name: Run Tests with pytest
         run: poetry run pytest --cov=gradient_metrics/ --cov-report=term-missing tests
+
+      - name: Run flake8
+        run: poetry run flake8 --max-line-length=88 --extend-exclude=.venv,venv
+
+      - name: Run mypy
+        run: mypy gradient_metrics
