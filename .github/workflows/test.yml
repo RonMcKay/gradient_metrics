@@ -1,7 +1,10 @@
 name: Test
 on:
   pull_request:
-    types: [opened, reopened]
+    types: 
+      - opened
+      - reopened
+      - ready_for_review
 
   workflow_dispatch:
 
@@ -32,3 +35,6 @@ jobs:
 
       - name: Run mypy
         run: poetry run mypy gradient_metrics
+
+      - name: Build the package
+        run: poetry build
