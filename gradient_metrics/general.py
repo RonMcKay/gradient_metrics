@@ -3,6 +3,7 @@ from typing import List, Sequence, Type, Union
 from gradient_metrics.metrics import GradientMetric
 import torch
 import torch.nn as nn
+from torch.utils.hooks import RemovableHandle
 
 
 class GradientMetricCollector(object):
@@ -24,6 +25,7 @@ class GradientMetricCollector(object):
         )
 
         self.metric_collection: List[GradientMetric] = []
+        self.metric_handles: List[RemovableHandle] = []
 
         self._register_metrics()
 
@@ -44,6 +46,10 @@ class GradientMetricCollector(object):
             metrics.append(self.get_metrics())
 
         return torch.stack(metrics).to(loss.device)
+
+    def __del__(self) -> None:
+        for h in self.metric_handles:
+            h.remove()
 
     def get_metrics(self, keep_buffer: bool = False) -> torch.Tensor:
         metrics = []
@@ -67,11 +73,11 @@ class GradientMetricCollector(object):
             if isinstance(t, torch.Tensor):
                 for m in self.metrics:
                     current_metric = m()
-                    t.register_hook(current_metric)
+                    self.metric_handles.append(t.register_hook(current_metric))
                     self.metric_collection.append(current_metric)
             else:
                 for m in self.metrics:
                     current_metric = m()
                     self.metric_collection.append(current_metric)
                     for param in t.parameters():
-                        param.register_hook(current_metric)
+                        self.metric_handles.append(param.register_hook(current_metric))
