@@ -67,11 +67,11 @@ class GradientMetricCollector(object):
             if isinstance(t, torch.Tensor):
                 for m in self.metrics:
                     current_metric = m()
-                    t.register_hook(current_metric)  # type: ignore
+                    t.register_hook(current_metric)
                     self.metric_collection.append(current_metric)
             else:
                 for m in self.metrics:
                     current_metric = m()
                     self.metric_collection.append(current_metric)
                     for param in t.parameters():
-                        param.register_hook(current_metric)  # type: ignore
+                        param.register_hook(current_metric)
