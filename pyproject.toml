@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "gradient_metrics"
+version = "0.1.0"
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/RonMcKay/gradient_metrics"
+repository = "https://github.com/RonMcKay/gradient_metrics"
+description = "Neural Network Gradient Metrics with PyTorch"
+authors = ["Philipp Oberdiek <git@oberdiek.net>"]
+
+[tool.poetry.dependencies]
+python = ">=3.6.2,<4"
+torch = "*"
+numpy = "*"
+
+[tool.poetry.dev-dependencies]
+flake8 = "*"
+mypy = "*"
+pytest = "*"
+pytest-cov = "*"
+tox = "*"
+black = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
