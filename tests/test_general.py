@@ -1,13 +1,27 @@
 from functools import partial
+from pathlib import Path
 
-from gradient_metrics import GradientMetricCollector, __version__
+import gradient_metrics
+from gradient_metrics import GradientMetricCollector
 from gradient_metrics.metrics import Max, MeanStd, Min
 import pytest
+import toml
 import torch
 
 
-def test_version():
-    assert __version__ == "0.1.0"
+def test_versions_are_in_sync():
+    """
+    Checks if the pyproject.toml and gradient_metrics.__init__.py __version__
+    are in sync.
+    """
+
+    path = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    pyproject = toml.loads(open(str(path)).read())
+    pyproject_version = pyproject["tool"]["poetry"]["version"]
+
+    package_init_version = gradient_metrics.__version__
+
+    assert package_init_version == pyproject_version
 
 
 def test_gradientmetriccollector():
