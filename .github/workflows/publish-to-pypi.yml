@@ -52,4 +52,4 @@ jobs:
         run: poetry config pypi-token.pypi ${{ secrets.PYPI_API_KEY }}
 
       - name: Build and publish package to PyPI
-        run: poetry publish --build -r testpypi
+        run: poetry publish --build
