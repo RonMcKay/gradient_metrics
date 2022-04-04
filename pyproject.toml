@@ -10,8 +10,7 @@ authors = ["Philipp Oberdiek <git@oberdiek.net>"]
 
 [tool.poetry.dependencies]
 python = ">=3.6.2,<4"
-torch = "^1.10.2"
-numpy = "^1.19.5"
+torch = ">=0.4.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"
