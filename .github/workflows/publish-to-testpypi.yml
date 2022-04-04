@@ -42,7 +42,7 @@ jobs:
         run: poetry run flake8 --max-line-length=88 --extend-exclude=.venv,venv
 
       - name: Run mypy
-        run: mypy gradient_metrics
+        run: poetry run mypy gradient_metrics
 
       - name: Add Test-PyPI repository to poetry config
         run: poetry config repositories.testpypi https://test.pypi.org/legacy/
