@@ -1,0 +1,10 @@
+-r requirements.txt
+
+# Release
+wheel
+
+# Tests
+tox
+flake8
+pytest
+pytest-cov
