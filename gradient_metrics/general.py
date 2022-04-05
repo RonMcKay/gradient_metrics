@@ -14,6 +14,10 @@ class GradientMetricCollector(object):
         ],
         metrics: Union[Sequence[Type[GradientMetric]], Type[GradientMetric]],
     ) -> None:
+
+        self.metric_collection: List[GradientMetric] = []
+        self.metric_handles: List[RemovableHandle] = []
+
         self.target_layers = (
             (target_layers,)
             if isinstance(target_layers, (nn.Module, torch.Tensor))
@@ -24,8 +28,8 @@ class GradientMetricCollector(object):
             tuple(metrics) if isinstance(metrics, (list, tuple)) else (metrics,)
         )
 
-        self.metric_collection: List[GradientMetric] = []
-        self.metric_handles: List[RemovableHandle] = []
+        if len(self.metrics) == 0:
+            raise ValueError("No metrics specified!")
 
         self._register_metrics()
 
