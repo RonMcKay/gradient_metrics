@@ -1,6 +1,6 @@
 <div align="center">
 
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/ronmckay/gradient_metrics/Publish%20to%20PyPI/main) ![](https://img.shields.io/badge/code%20style-black-black) ![](https://img.shields.io/badge/licence-MIT-blueviolet)
+![PyPI](https://img.shields.io/pypi/v/gradient-metrics) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/ronmckay/gradient_metrics/Publish%20to%20PyPI/main) ![](https://img.shields.io/badge/code%20style-black-black) ![PyPI - License](https://img.shields.io/pypi/l/gradient-metrics) ![PyPI - Downloads](https://img.shields.io/pypi/dm/gradient-metrics)
 
 </div>
 
