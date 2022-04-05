@@ -60,7 +60,7 @@ def test_min():
     assert metric.data == torch.tensor(0.0)
 
 
-def test_pnorm():
+def test_pnorm_inputs():
     with pytest.raises(ValueError):
         PNorm(p=float("inf"))
 
@@ -70,6 +70,8 @@ def test_pnorm():
     with pytest.raises(ValueError):
         PNorm(eps=0.0)
 
+
+def test_pnorm():
     metric = PNorm()
     parameter = torch.ones((3,), requires_grad=True)
     parameter.register_hook(metric)
@@ -98,10 +100,15 @@ def test_mean():
     assert metric.data == torch.tensor(0.0)
 
 
-def test_meanstd():
+def test_meanstd_inputs():
     with pytest.raises(ValueError):
         MeanStd(eps=-1.0)
 
+    with pytest.raises(ValueError):
+        MeanStd(eps=0.0)
+
+
+def test_meanstd():
     eps = 1e-16
     metric = MeanStd(eps=eps)
     parameter = torch.ones((3,), requires_grad=True)
