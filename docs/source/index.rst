@@ -6,6 +6,7 @@ Welcome to PyTorch Gradient Metrics's documentation!
    :caption: Contents:
 
    documentation
+   example
 
 Indices and tables
 ==================
