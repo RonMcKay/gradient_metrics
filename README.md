@@ -6,7 +6,9 @@
 
 # Installation
 
-```pip install gradient-metrics```
+```python
+pip install gradient-metrics
+```
 
 This package implements utilities for computing gradient metrics for measuring uncertainties in neural networks based on the paper "[Classification Uncertainty of Deep Neural Networks Based on Gradient Information](https://arxiv.org/abs/1805.08440)".
 
@@ -30,6 +32,6 @@ Documentation is following.
   pages     = {113--125},  
   publisher = {Springer},  
   year      = {2018},  
-  url       = {https://doi.org/10.1007/978-3-319-99978-4\_9},  
-  doi       = {10.1007/978-3-319-99978-4\_9},  
+  url       = { https://doi.org/10.1007/978-3-319-99978-4_9 },  
+  doi       = { 10.1007/978-3-319-99978-4\_9 },  
 }
