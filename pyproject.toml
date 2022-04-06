@@ -18,12 +18,14 @@ numpy = "*"
 torch = ">=1.4.0"
 
 [tool.poetry.dev-dependencies]
-flake8 = "^4.0.1"
+flake8 = "^3.9.2"
 mypy = "^0.942"
 pytest = "^7.0.1"
 pytest-cov = "^3.0.0"
 tox = "^3.24.5"
 black = "^22.3.0"
+Sphinx = "^4.5.0"
+sphinx-rtd-theme = "^1.0.0"
 
 [tool.mypy]
 disallow_untyped_defs = true
