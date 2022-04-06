@@ -18,6 +18,7 @@ GradientMetric
 .. autoclass:: gradient_metrics.metrics.GradientMetric
    :members:
    :undoc-members:
+   :private-members:
    :special-members: __call__
 
 PNorm
