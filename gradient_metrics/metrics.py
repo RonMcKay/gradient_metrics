@@ -126,50 +126,57 @@ class MeanStd(GradientMetric):
 
         self.return_mean = return_mean
 
-        self.mean: torch.Tensor
-        self.m2: torch.Tensor
-        self.count: int
+        self._mean: torch.Tensor
+        self._m2: torch.Tensor
+        self._count: int
         self.reset()
 
     def _collect(self, grad: torch.Tensor) -> None:
-        if self.m2.device != grad.device:
-            self.m2 = self.mean.to(grad.device)
-            self.mean = self.mean.to(grad.device)
+        if self._m2.device != grad.device:
+            self._m2 = self._m2.to(grad.device)
+            self._mean = self._mean.to(grad.device)
 
         # do a batch update according to Welford's algorithm
 
-        self.count += grad.view(-1).shape[0]
+        self._count += grad.view(-1).shape[0]
         # gradient computation graph of mean is still available through
         # mean in the following line so we can detach this one
-        old_mean = self.mean.detach().clone()
-        self.mean = self.mean + torch.sum((grad.view(-1) - old_mean) / self.count)
-        self.m2 = self.m2 + torch.sum(
+        old_mean = self._mean.detach().clone()
+        self._mean = self._mean + torch.sum((grad.view(-1) - old_mean) / self._count)
+        self._m2 = self._m2 + torch.sum(
             grad.view(-1).pow(2)
-            - grad.view(-1) * (old_mean + self.mean)
-            + old_mean * self.mean
+            - grad.view(-1) * (old_mean + self._mean)
+            + old_mean * self._mean
         )
 
     def _get_metric(self) -> torch.Tensor:
-        if self.count > 1:
+        if self._count > 1:
             return torch.cat(
                 (
-                    self.mean.view(-1)
+                    self._mean.view(-1)
                     if self.return_mean
-                    else torch.empty((0,), device=self.mean.device),
-                    torch.sqrt(self.m2 / (self.count - 1) + self.eps**2).view(-1),
+                    else torch.empty((0,), device=self._mean.device),
+                    torch.sqrt(self._m2 / (self._count - 1) + self.eps**2).view(-1),
                 )
             )
         else:
             return torch.cat(
                 (
-                    self.mean.view(-1)
+                    self._mean.view(-1)
                     if self.return_mean
-                    else torch.empty((0,), device=self.mean.device),
-                    torch.tensor(self.eps, device=self.mean.device).view(-1),
+                    else torch.empty((0,), device=self._mean.device),
+                    torch.tensor(self.eps, device=self._mean.device).view(-1),
                 )
             )
 
     def reset(self) -> None:
-        self.mean = torch.tensor(0.0)
-        self.m2 = torch.tensor(0.0)
-        self.count = 0
+        """Initializes/resets the buffer
+
+        | The following values are set:
+        | mean = 0
+        | m2 = 0
+        | count = 0
+        """
+        self._mean = torch.tensor(0.0)
+        self._m2 = torch.tensor(0.0)
+        self._count = 0
