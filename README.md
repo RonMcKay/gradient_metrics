@@ -1,6 +1,6 @@
 <div align="center">
 
-[![PyPI](https://img.shields.io/pypi/v/gradient-metrics)](https://pypi.org/project/gradient-metrics/) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/ronmckay/gradient_metrics/Publish%20to%20PyPI/main) [![](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black) [![PyPI - License](https://img.shields.io/pypi/l/gradient-metrics)](LICENSE) ![PyPI - Downloads](https://img.shields.io/pypi/dm/gradient-metrics)
+[![PyPI](https://img.shields.io/pypi/v/gradient-metrics)](https://pypi.org/project/gradient-metrics/) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/ronmckay/gradient_metrics/Publish%20to%20PyPI/main) [![](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black) [![PyPI - License](https://img.shields.io/pypi/l/gradient-metrics)](https://github.com/RonMcKay/gradient_metrics/blob/main/LICENSE) ![PyPI - Downloads](https://img.shields.io/pypi/dm/gradient-metrics)
 
 </div>
 
