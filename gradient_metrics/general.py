@@ -81,6 +81,7 @@ class GradientMetricCollector(object):
 
             metrics.append(self.data)
             self.reset()
+            self.zero_grad()
 
         return torch.stack(metrics).to(loss.device)
 
@@ -92,6 +93,19 @@ class GradientMetricCollector(object):
         """Resets all gradient metric instances to their default values."""
         for m in self.metric_collection:
             m.reset()
+
+    def zero_grad(self) -> None:
+        for t in self.target_layers:
+            if isinstance(t, torch.Tensor):
+                # This part is taken from `torch.nn.Module.zero_grad`
+                if t.grad is not None:
+                    if t.grad.grad_fn is not None:
+                        t.grad.detach_()
+                    else:
+                        t.grad.requires_grad_(False)
+                    t.grad.zero_()
+            else:
+                t.zero_grad()
 
     @property
     def data(self) -> torch.Tensor:
