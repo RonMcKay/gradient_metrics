@@ -21,26 +21,10 @@ GradientMetric
    :private-members:
    :special-members: __call__
 
-PNorm
------
-
-.. autoclass:: gradient_metrics.metrics.PNorm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Max
 ---
 
 .. autoclass:: gradient_metrics.metrics.Max
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Min
----
-
-.. autoclass:: gradient_metrics.metrics.Min
    :members:
    :undoc-members:
    :show-inheritance:
@@ -57,6 +41,22 @@ MeanStd
 -------
 
 .. autoclass:: gradient_metrics.metrics.MeanStd
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Min
+---
+
+.. autoclass:: gradient_metrics.metrics.Min
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+PNorm
+-----
+
+.. autoclass:: gradient_metrics.metrics.PNorm
    :members:
    :undoc-members:
    :show-inheritance:
