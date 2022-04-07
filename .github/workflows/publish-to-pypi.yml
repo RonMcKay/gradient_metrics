@@ -7,6 +7,10 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Git Ref (Optional)
+        required: false
 
 jobs:
   build-and-publish:
@@ -19,6 +23,13 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
+        if: github.event.inputs.git-ref == ''
+
+      - name: Check out repository with specific ref
+        uses: actions/checkout@v3
+        if: github.event.inputs.git-ref != ''
+        with:
+          ref: ${{ github.event.inputs.git-ref }}
 
       - name: Set up python
         id: setup-python
