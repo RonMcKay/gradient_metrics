@@ -95,6 +95,14 @@ class GradientMetricCollector(object):
 
     @property
     def data(self) -> torch.Tensor:
+        """Holds the metric data.
+
+        Returns:
+            torch.Tensor:
+                The metric values.
+                All metrics are read out of the ``GradientMetric`` instances and
+                concatenated. The output shape is ``(dim,)``.
+        """
         metrics = []
         for m in self.metric_collection:
             metrics.append(m.data)
