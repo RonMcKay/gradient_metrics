@@ -1,0 +1,43 @@
+name: Lint
+on:
+  pull_request_target:
+    types: [opened, ready_for_review, review_requested, reopened]
+
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Git Ref (Optional)
+        required: false
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        if: github.event.inputs.git-ref == ''
+
+      - name: Check out repository with specific ref
+        uses: actions/checkout@v3
+        if: github.event.inputs.git-ref != ''
+        with:
+          ref: ${{ github.event.inputs.git-ref }}
+
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+
+      - name: Update pip
+        run: python3 -m pip install --upgrade pip
+
+      - name: Install flake8
+        run: python3 -m pip install flake8
+
+      - name: Lint with flake8
+        run: |
+          # stop the action if there are syntax errors or undefined variables
+          flake8 . --max-line-length=88 --extend-exclude=.venv,venv --select=E9,F63,F7,F82
+          # treat all errors as warnings
+          flake8 . --max-line-length=88 --extend-exclude=.venv,venv --count --exit-zero --max-complexity=10 --statistics
