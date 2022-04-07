@@ -1,8 +1,8 @@
 Documentation
 #############
 
-``GradientMetricCollector``
-===========================
+Gradient Metric Collector
+=========================
 
 .. autoclass:: gradient_metrics.GradientMetricCollector
    :members:
