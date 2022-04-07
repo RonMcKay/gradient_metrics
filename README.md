@@ -1,12 +1,14 @@
 <div align="center">
 
-![PyPI](https://img.shields.io/pypi/v/gradient-metrics) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/ronmckay/gradient_metrics/Publish%20to%20PyPI/main) ![](https://img.shields.io/badge/code%20style-black-black) ![PyPI - License](https://img.shields.io/pypi/l/gradient-metrics) ![PyPI - Downloads](https://img.shields.io/pypi/dm/gradient-metrics)
+[![PyPI](https://img.shields.io/pypi/v/gradient-metrics)](https://pypi.org/project/gradient-metrics/) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/ronmckay/gradient_metrics/Publish%20to%20PyPI/main) [![](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black) [![PyPI - License](https://img.shields.io/pypi/l/gradient-metrics)](LICENSE) ![PyPI - Downloads](https://img.shields.io/pypi/dm/gradient-metrics)
 
 </div>
 
 # Installation
 
-```pip install gradient-metrics```
+```python
+pip install gradient-metrics
+```
 
 This package implements utilities for computing gradient metrics for measuring uncertainties in neural networks based on the paper "[Classification Uncertainty of Deep Neural Networks Based on Gradient Information](https://arxiv.org/abs/1805.08440)".
 
@@ -30,6 +32,6 @@ Documentation and examples can be found on [GitHub pages](https://ronmckay.githu
   pages     = {113--125},  
   publisher = {Springer},  
   year      = {2018},  
-  url       = {https://doi.org/10.1007/978-3-319-99978-4\_9},  
-  doi       = {10.1007/978-3-319-99978-4\_9},  
+  url       = { https://doi.org/10.1007/978-3-319-99978-4_9 },  
+  doi       = { 10.1007/978-3-319-99978-4\_9 },  
 }

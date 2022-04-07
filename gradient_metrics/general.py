@@ -79,7 +79,8 @@ class GradientMetricCollector(object):
         for sample_loss in loss:
             sample_loss.backward(retain_graph=True, create_graph=create_graph)
 
-            metrics.append(self.get_metrics())
+            metrics.append(self.data)
+            self.reset()
 
         return torch.stack(metrics).to(loss.device)
 
@@ -87,28 +88,18 @@ class GradientMetricCollector(object):
         for h in self.metric_handles:
             h.remove()
 
-    def get_metrics(self, keep_buffer: bool = False) -> torch.Tensor:
-        """Extracts the accumulated gradient metrics.
-
-        Args:
-            keep_buffer (bool, optional): Whether to keep the buffer in the metric
-                instances or reset them directly after readout. Defaults to False.
-
-        Returns:
-            torch.Tensor: Gradient metrics per sample with a shape of ``(N,dim)``.
-        """
-        metrics = []
-        for m in self.metric_collection:
-            metrics.append(m.data)
-            if not keep_buffer:
-                m.reset()
-
-        return torch.cat(metrics)
-
     def reset(self) -> None:
         """Resets all gradient metric instances to their default values."""
         for m in self.metric_collection:
             m.reset()
+
+    @property
+    def data(self) -> torch.Tensor:
+        metrics = []
+        for m in self.metric_collection:
+            metrics.append(m.data)
+
+        return torch.cat(metrics)
 
     @property
     def dim(self) -> int:
@@ -120,7 +111,7 @@ class GradientMetricCollector(object):
         Returns:
             int: The number of gradient metrics per sample.
         """
-        return self.get_metrics(keep_buffer=True).shape[0]
+        return self.data.shape[0]
 
     def _register_metrics(self) -> None:
         for t in self.target_layers:
