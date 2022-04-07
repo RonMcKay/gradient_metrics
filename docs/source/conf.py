@@ -12,6 +12,7 @@
 #
 import os
 import sys
+from gradient_metrics import __version__
 
 sys.path.insert(0, os.path.abspath("../../gradient_metrics/"))
 
@@ -32,6 +33,8 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
 ]
+
+version = __version__
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
