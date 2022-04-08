@@ -7,7 +7,7 @@ Gradient Metric Collector
 .. autoclass:: gradient_metrics.GradientMetricCollector
    :members:
    :undoc-members:
-   :special-members: __init__ __call__
+   :special-members: __call__
 
 Gradient Metrics
 ================
