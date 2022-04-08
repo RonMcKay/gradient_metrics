@@ -4,10 +4,6 @@ on:
     types: [opened, ready_for_review, review_requested, reopened]
 
   workflow_dispatch:
-    inputs:
-      git-ref:
-        description: Git Ref (Optional)
-        required: false
 
 jobs:
   lint:
@@ -31,6 +27,17 @@ jobs:
 
       - name: Update pip
         run: python3 -m pip install --upgrade pip
+
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+
+      - name: pip cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ steps.setup-python.outputs.python-version }}-linting
 
       - name: Install flake8
         run: python3 -m pip install flake8
