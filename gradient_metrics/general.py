@@ -49,15 +49,12 @@ class GradientMetricCollector(object):
 
         self._register_metrics()
 
-    def __call__(self, loss: torch.Tensor, create_graph: bool = False) -> torch.Tensor:
+    def __call__(self, loss: torch.Tensor) -> torch.Tensor:
         """Computes gradient metrics per sample.
 
         Args:
             loss (torch.Tensor): A loss tensor to compute the gradients on. This should
                 have a shape of ``(N,)`` with ``N`` being the number of samples.
-            create_graph (bool, optional): If true, creates a backward graph when
-                computing the gradients. This could be utilized for second order
-                derivatives on the gradient metrics themselfs. Defaults to False.
 
         Raises:
             ValueError: If the loss does not require a gradient
@@ -77,7 +74,7 @@ class GradientMetricCollector(object):
         metrics = []
 
         for sample_loss in loss:
-            sample_loss.backward(retain_graph=True, create_graph=create_graph)
+            sample_loss.backward(retain_graph=True)
 
             metrics.append(self.data)
             self.reset()
