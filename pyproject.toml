@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "gradient_metrics"
-version = "0.1.7"
+version = "0.1.8"
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/RonMcKay/gradient_metrics"
