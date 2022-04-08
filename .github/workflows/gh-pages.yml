@@ -7,10 +7,6 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    inputs:
-      git-ref:
-        description: Git Ref (Optional)
-        required: false
 
 jobs:
   deploy:
@@ -23,13 +19,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-        if: github.event.inputs.git-ref == ''
-
-      - name: Check out repository with specific ref
-        uses: actions/checkout@v3
-        if: github.event.inputs.git-ref != ''
-        with:
-          ref: ${{ github.event.inputs.git-ref }}
 
       - name: Set up python
         id: setup-python
@@ -43,12 +32,20 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
+      - name: Get poetry cache dir
+        id: poetry-cache
+        run: |
+          echo "::set-output name=dir::$(poetry config cache-dir)"
+
       - name: Load cached venv
         id: cached-poetry-dependencies
         uses: actions/cache@v3
         with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          path: |
+            ${{ steps.poetry-cache.outputs.dir }}
+            .venv
+            poetry.lock
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
