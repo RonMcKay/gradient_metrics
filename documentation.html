@@ -108,6 +108,30 @@ will register all of these metrics as backward hooks.</p></li>
 <dd class="field-even"><p><strong>ValueError</strong> – If the list of metrics is empty.</p>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gradient_metrics.GradientMetricCollector.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#gradient_metrics.GradientMetricCollector.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Computes gradient metrics per sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss</strong> (<em>torch.Tensor</em>) – A loss tensor to compute the gradients on. This should
+have a shape of <code class="docutils literal notranslate"><span class="pre">(N,)</span></code> with <code class="docutils literal notranslate"><span class="pre">N</span></code> being the number of samples.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the loss does not require a gradient</p></li>
+<li><p><strong>ValueError</strong> – If the loss does not have a shape of <code class="docutils literal notranslate"><span class="pre">(N,)</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gradient metrics per sample with a shape of <code class="docutils literal notranslate"><span class="pre">(N,dim)</span></code>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="gradient_metrics.GradientMetricCollector.data">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">torch.Tensor</span></em><a class="headerlink" href="#gradient_metrics.GradientMetricCollector.data" title="Permalink to this definition"></a></dt>
