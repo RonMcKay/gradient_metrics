@@ -32,8 +32,8 @@ jobs:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ steps.setup-python.outputs.python-version }}-linting
 
-      - name: Install flake8
-        run: python3 -m pip install flake8
+      - name: Install flake8, black and isort
+        run: python3 -m pip install flake8 black isort
 
       - name: Lint with flake8
         run: |
@@ -41,3 +41,9 @@ jobs:
           flake8 . --max-line-length=88 --extend-exclude=.venv,venv --select=E9,F63,F7,F82
           # treat all errors as warnings
           flake8 . --max-line-length=88 --extend-exclude=.venv,venv --count --exit-zero --max-complexity=10 --statistics
+
+      - name: Check format with black
+        run: black gradient_metrics tests --check
+
+      - name: Check format with isort
+        run: isort --check --settings-path pyproject.toml gradient_metrics tests

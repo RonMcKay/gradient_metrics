@@ -50,6 +50,12 @@ jobs:
           # treat all errors as warnings
           poetry run flake8 . --max-line-length=88 --extend-exclude=.venv,venv --count --exit-zero --max-complexity=10 --statistics
 
+      - name: Check format with black
+        run: poetry run black --check gradient_metrics tests
+
+      - name: Check format with isort
+        run: poetry run isort --check --settings-path pyproject.toml gradient_metrics tests
+
       - name: Run mypy
         run: poetry run mypy gradient_metrics
 
