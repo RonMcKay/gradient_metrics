@@ -1,13 +1,8 @@
 name: Lint
 on:
   pull_request_target:
-    types: [opened, ready_for_review, review_requested, reopened]
 
   workflow_dispatch:
-    inputs:
-      git-ref:
-        description: Git Ref (Optional)
-        required: false
 
 jobs:
   lint:
@@ -15,13 +10,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-        if: github.event.inputs.git-ref == ''
-
-      - name: Check out repository with specific ref
-        uses: actions/checkout@v3
-        if: github.event.inputs.git-ref != ''
-        with:
-          ref: ${{ github.event.inputs.git-ref }}
 
       - name: Set up python
         id: setup-python
@@ -32,8 +20,19 @@ jobs:
       - name: Update pip
         run: python3 -m pip install --upgrade pip
 
-      - name: Install flake8
-        run: python3 -m pip install flake8
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+
+      - name: pip cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ steps.setup-python.outputs.python-version }}-linting
+
+      - name: Install flake8, black and isort
+        run: python3 -m pip install flake8 black isort
 
       - name: Lint with flake8
         run: |
@@ -41,3 +40,9 @@ jobs:
           flake8 . --max-line-length=88 --extend-exclude=.venv,venv --select=E9,F63,F7,F82
           # treat all errors as warnings
           flake8 . --max-line-length=88 --extend-exclude=.venv,venv --count --exit-zero --max-complexity=10 --statistics
+
+      - name: Check format with black
+        run: black gradient_metrics tests --check
+
+      - name: Check format with isort
+        run: isort --check --settings-path pyproject.toml gradient_metrics tests

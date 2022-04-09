@@ -14,6 +14,8 @@ test: lint
 
 lint:
 	poetry run flake8 . --max-line-length=88 --extend-exclude=.venv,venv --count --statistics
+	poetry run black --check gradient_metrics tests
+	poetry run isort --check --settings-path pyproject.toml gradient_metrics tests
 
 clean:
 	rm -rfv dist/
