@@ -1,18 +1,14 @@
-from typing import List, Sequence, Type, Union
+from typing import Sequence, Set, Union
 
 from gradient_metrics.metrics import GradientMetric
 import torch
 import torch.nn as nn
-from torch.utils.hooks import RemovableHandle
 
 
 class GradientMetricCollector(object):
     def __init__(
         self,
-        target_layers: Union[
-            Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
-        ],
-        metrics: Union[Sequence[Type[GradientMetric]], Type[GradientMetric]],
+        metrics: Union[Sequence[GradientMetric], GradientMetric],
     ) -> None:
         """Helper class for computing gradients.
 
@@ -31,23 +27,17 @@ class GradientMetricCollector(object):
             ValueError: If the list of metrics is empty.
         """
 
-        self.metric_collection: List[GradientMetric] = []
-        self.metric_handles: List[RemovableHandle] = []
-
-        self.target_layers = (
-            (target_layers,)
-            if isinstance(target_layers, (nn.Module, torch.Tensor))
-            else tuple(target_layers)
-        )
-
         self.metrics = (
             tuple(metrics) if isinstance(metrics, (list, tuple)) else (metrics,)
         )
+        self.target_layers: Set[Union[nn.Module, torch.Tensor]] = set()
+
+        # collect all parameters for zeroing gradients
+        for m in self.metrics:
+            self.target_layers.update(m.target_layers)
 
         if len(self.metrics) == 0:
             raise ValueError("No metrics specified!")
-
-        self._register_metrics()
 
     def __call__(self, loss: torch.Tensor) -> torch.Tensor:
         """Computes gradient metrics per sample.
@@ -82,13 +72,9 @@ class GradientMetricCollector(object):
 
         return torch.stack(metrics).to(loss.device)
 
-    def __del__(self) -> None:
-        for h in self.metric_handles:
-            h.remove()
-
     def reset(self) -> None:
         """Resets all gradient metric instances to their default values."""
-        for m in self.metric_collection:
+        for m in self.metrics:
             m.reset()
 
     def zero_grad(self) -> None:
@@ -114,11 +100,11 @@ class GradientMetricCollector(object):
                 All metrics are read out of the ``GradientMetric`` instances and
                 concatenated. The output shape is ``(dim,)``.
         """
-        metrics = []
-        for m in self.metric_collection:
-            metrics.append(m.data)
+        metric_data = []
+        for m in self.metrics:
+            metric_data.append(m.data)
 
-        return torch.cat(metrics)
+        return torch.cat(metric_data)
 
     @property
     def dim(self) -> int:
@@ -131,17 +117,3 @@ class GradientMetricCollector(object):
             int: The number of gradient metrics per sample.
         """
         return self.data.shape[0]
-
-    def _register_metrics(self) -> None:
-        for t in self.target_layers:
-            if isinstance(t, torch.Tensor):
-                for m in self.metrics:
-                    current_metric = m()
-                    self.metric_handles.append(t.register_hook(current_metric))
-                    self.metric_collection.append(current_metric)
-            else:
-                for m in self.metrics:
-                    current_metric = m()
-                    self.metric_collection.append(current_metric)
-                    for param in t.parameters():
-                        self.metric_handles.append(param.register_hook(current_metric))

@@ -1,8 +1,24 @@
+from typing import List, Sequence, Union
+
 import torch
+import torch.nn as nn
+from torch.utils.hooks import RemovableHandle
 
 
 class GradientMetric(object):
-    """This is the base class for all gradient metrics."""
+    def __init__(
+        self,
+        target_layers: Union[
+            Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
+        ],
+    ) -> None:
+        self.hook_handles: List[RemovableHandle] = []
+        self.target_layers = (
+            (target_layers,)
+            if isinstance(target_layers, (nn.Module, torch.Tensor))
+            else tuple(target_layers)
+        )
+        self._register()
 
     def __call__(self, grad: torch.Tensor) -> None:
         """A gradient metric instance is registered as a backward hook on parameters.
@@ -14,6 +30,10 @@ class GradientMetric(object):
                 metric is going to be computed.
         """
         self._collect(grad)
+
+    def __del__(self) -> None:
+        for hook in self.hook_handles:
+            hook.remove()
 
     def _collect(self, grad: torch.Tensor) -> None:
         """This method has to be implemented by every GradientMetric subclass.
@@ -59,9 +79,24 @@ class GradientMetric(object):
         """
         raise NotImplementedError
 
+    def _register(self) -> None:
+        for t in self.target_layers:
+            if isinstance(t, torch.Tensor):
+                self.hook_handles.append(t.register_hook(self))
+            else:
+                for param in t.parameters():
+                    self.hook_handles.append(param.register_hook(self))
+
 
 class PNorm(GradientMetric):
-    def __init__(self, p: int = 1, eps: float = 1e-16) -> None:
+    def __init__(
+        self,
+        target_layers: Union[
+            Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
+        ],
+        p: int = 1,
+        eps: float = 1e-16,
+    ) -> None:
         r"""Computes the p-norm over the flattened gradients.
 
         .. math::
@@ -77,7 +112,7 @@ class PNorm(GradientMetric):
             ValueError: If p is smaller or equal to zero.
             ValueError: If eps is smaller or equal to zero.
         """
-        super().__init__()
+        super().__init__(target_layers=target_layers)
 
         if not 0 < p < float("inf"):
             raise ValueError(f"p has to be in (0, inf), got {p}")
@@ -114,8 +149,13 @@ class Min(GradientMetric):
     computed on each call, overwriting the buffer with the result.
     """
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        target_layers: Union[
+            Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
+        ],
+    ) -> None:
+        super().__init__(target_layers=target_layers)
         self._metric_buffer: torch.Tensor
         self.reset()
 
@@ -139,8 +179,13 @@ class Max(GradientMetric):
     computed on each call, saving the result in the buffer.
     """
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        target_layers: Union[
+            Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
+        ],
+    ) -> None:
+        super().__init__(target_layers=target_layers)
         self._metric_buffer: torch.Tensor
         self.reset()
 
@@ -165,8 +210,13 @@ class Mean(GradientMetric):
     computation cost if you do not want to computed the standard deviation.
     """
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        target_layers: Union[
+            Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
+        ],
+    ) -> None:
+        super().__init__(target_layers=target_layers)
         self._metric_buffer: torch.Tensor
         self._count: int
         self.reset()
@@ -191,7 +241,14 @@ class Mean(GradientMetric):
 
 
 class MeanStd(GradientMetric):
-    def __init__(self, return_mean: bool = True, eps: float = 1e-16) -> None:
+    def __init__(
+        self,
+        target_layers: Union[
+            Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
+        ],
+        return_mean: bool = True,
+        eps: float = 1e-16,
+    ) -> None:
         """Computes Mean and Standard Deviation.
 
         This uses `Welford's online algorithm <https://doi.org/10.2307%2F1266577>`_
@@ -210,7 +267,7 @@ class MeanStd(GradientMetric):
         Raises:
             ValueError: If eps is smaller or equal to zero.
         """
-        super().__init__()
+        super().__init__(target_layers=target_layers)
 
         if not eps > 0:
             raise ValueError(f"eps has to be greater than zero, got {eps}")
