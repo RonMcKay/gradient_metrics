@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> PyTorch Gradient Metrics
           </a>
               <div class="version">
-                0.1.8
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -71,9 +71,8 @@
              
   <section id="example">
 <h1>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h1>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-
-<span class="kn">from</span> <span class="nn">gradient_metrics</span> <span class="kn">import</span> <span class="n">GradientMetricCollector</span><span class="p">,</span> <span class="n">metrics</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gradient_metrics</span> <span class="kn">import</span> <span class="n">GradientMetricCollector</span>
+<span class="kn">from</span> <span class="nn">gradient_metrics.metrics</span> <span class="kn">import</span> <span class="n">Max</span><span class="p">,</span> <span class="n">Min</span><span class="p">,</span> <span class="n">PNorm</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
@@ -130,12 +129,20 @@
     <span class="c1"># the feature extractor and the fully connected part</span>
     <span class="c1"># We use Max, Min and PNorm with p=2</span>
     <span class="n">mcollector</span> <span class="o">=</span> <span class="n">GradientMetricCollector</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">fc</span><span class="p">),</span>
-        <span class="p">(</span>
-            <span class="n">metrics</span><span class="o">.</span><span class="n">Max</span><span class="p">,</span>
-            <span class="n">metrics</span><span class="o">.</span><span class="n">Min</span><span class="p">,</span>
-            <span class="n">partial</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">PNorm</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-        <span class="p">),</span>
+        <span class="p">[</span>
+            <span class="c1"># Extract metrics from the whole network</span>
+            <span class="n">Max</span><span class="p">(</span><span class="n">net</span><span class="p">),</span>
+            <span class="n">Min</span><span class="p">(</span><span class="n">net</span><span class="p">),</span>
+            <span class="n">PNorm</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="c1"># Extract metrics from the feature extraction part</span>
+            <span class="n">Max</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">features</span><span class="p">),</span>
+            <span class="n">Min</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">features</span><span class="p">),</span>
+            <span class="n">PNorm</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="c1"># Extract metrics from the fully connected part</span>
+            <span class="n">Max</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">fc</span><span class="p">),</span>
+            <span class="n">Min</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">fc</span><span class="p">),</span>
+            <span class="n">PNorm</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">fc</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">]</span>
     <span class="p">)</span>
 
     <span class="c1"># predict the dummy data</span>
@@ -157,6 +164,20 @@
     <span class="c1"># 3 metrics over the feature part</span>
     <span class="c1"># 3 metrics over the fully connected part</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of the gradient metric output: </span><span class="si">{</span><span class="n">grad_metrics</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Now let&#39;s say we want to have the minimum and maximum of the absolute gradient</span>
+    <span class="c1"># values in the first convolution&#39;s kernel. We can achieve that by using a</span>
+    <span class="c1"># `grad_transform`:</span>
+    <span class="n">mcollector</span> <span class="o">=</span> <span class="n">GradientMetricCollector</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">Min</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">grad_transform</span><span class="o">=</span><span class="k">lambda</span> <span class="n">grad</span><span class="p">:</span> <span class="n">grad</span><span class="o">.</span><span class="n">abs</span><span class="p">()),</span>
+            <span class="n">Max</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">grad_transform</span><span class="o">=</span><span class="k">lambda</span> <span class="n">grad</span><span class="p">:</span> <span class="n">grad</span><span class="o">.</span><span class="n">abs</span><span class="p">()),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">grad_metrics</span> <span class="o">=</span> <span class="n">mcollector</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value range of absolute gradient values:</span><span class="se">\n</span><span class="si">{</span><span class="n">grad_metrics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
