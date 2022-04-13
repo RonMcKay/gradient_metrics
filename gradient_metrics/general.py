@@ -13,15 +13,8 @@ class GradientMetricCollector(object):
         """Helper class for computing gradients.
 
         Args:
-            target_layers (torch.nn.Module, torch.Tensor or sequence of them): Layers
-                or tensors on which the metrics will be registered as backward hooks.
-                For ``torch.nn.Module`` instances a single metric instance will be
-                registered to all parameters returned by
-                ``torch.nn.Module.parameters()``, thus computing the metric over all
-                parameters of the Module.
-            metrics (Type[GradientMetric] or sequence of Type[GradientMetric]):
-                A list of metric types to use. Each parameter from ``target_layers``
-                will register all of these metrics as backward hooks.
+            metrics (sequence of GradientMetric or GradientMetric):
+                A list of gradient metrics.
 
         Raises:
             ValueError: If the list of metrics is empty.

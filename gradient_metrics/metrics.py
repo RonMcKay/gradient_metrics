@@ -13,6 +13,20 @@ class GradientMetric(object):
         ],
         grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     ) -> None:
+        """This is the base class for all gradient metrics
+
+        Args:
+            target_layers (torch.nn.Module, torch.Tensor or sequence of them): Layers
+                or tensors on which the metrics will be registered as backward hooks.
+                For ``torch.nn.Module`` instances a single metric instance will be
+                registered to all parameters returned by
+                ``torch.nn.Module.parameters()``, thus computing the metric over all
+                parameters of the Module.
+            grad_transform (Optional[Callable[[torch.Tensor], torch.Tensor]], optional):
+                A callable which accepts a ``torch.Tensor`` as input and returns a
+                ``torch.Tensor``. The callable is applied to the gradient before it is
+                handed over to the ``_collect`` method of a ``GradientMetric`` instance.
+        """
         self.hook_handles: List[RemovableHandle] = []
         self.target_layers = (
             (target_layers,)
@@ -108,6 +122,16 @@ class PNorm(GradientMetric):
             (\sum_{i=1}^n |x_i|^p)^{\frac{1}{p}}
 
         Args:
+            target_layers (torch.nn.Module, torch.Tensor or sequence of them): Layers
+                or tensors on which the metrics will be registered as backward hooks.
+                For ``torch.nn.Module`` instances a single metric instance will be
+                registered to all parameters returned by
+                ``torch.nn.Module.parameters()``, thus computing the metric over all
+                parameters of the Module.
+            grad_transform (Optional[Callable[[torch.Tensor], torch.Tensor]], optional):
+                A callable which accepts a ``torch.Tensor`` as input and returns a
+                ``torch.Tensor``. The callable is applied to the gradient before it is
+                handed over to the ``_collect`` method of a ``GradientMetric`` instance.
             p (int, optional): Power of the norm. Defaults to 1 (absolute-value norm).
             eps (float, optional): Small epsilon for gradients with very small vector
                 norms which would otherwise result in a possible division by zero in
@@ -148,12 +172,6 @@ class PNorm(GradientMetric):
 
 
 class Min(GradientMetric):
-    """Computes the minimum over the gradients.
-
-    The minimum between the currently saved buffer and the supplied gradients is
-    computed on each call, overwriting the buffer with the result.
-    """
-
     def __init__(
         self,
         target_layers: Union[
@@ -161,6 +179,23 @@ class Min(GradientMetric):
         ],
         grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     ) -> None:
+        """Computes the minimum over the gradients.
+
+        The minimum between the currently saved buffer and the supplied gradients is
+        computed on each call, overwriting the buffer with the result.
+
+        Args:
+            target_layers (torch.nn.Module, torch.Tensor or sequence of them): Layers
+                or tensors on which the metrics will be registered as backward hooks.
+                For ``torch.nn.Module`` instances a single metric instance will be
+                registered to all parameters returned by
+                ``torch.nn.Module.parameters()``, thus computing the metric over all
+                parameters of the Module.
+            grad_transform (Optional[Callable[[torch.Tensor], torch.Tensor]], optional):
+                A callable which accepts a ``torch.Tensor`` as input and returns a
+                ``torch.Tensor``. The callable is applied to the gradient before it is
+                handed over to the ``_collect`` method of a ``GradientMetric`` instance.
+        """
         super().__init__(target_layers=target_layers, grad_transform=grad_transform)
         self._metric_buffer: torch.Tensor
         self.reset()
@@ -179,12 +214,6 @@ class Min(GradientMetric):
 
 
 class Max(GradientMetric):
-    """Computes the maximum over the gradients.
-
-    The maximum between the currently saved buffer and the supplied gradients is
-    computed on each call, saving the result in the buffer.
-    """
-
     def __init__(
         self,
         target_layers: Union[
@@ -192,6 +221,23 @@ class Max(GradientMetric):
         ],
         grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     ) -> None:
+        """Computes the maximum over the gradients.
+
+        The maximum between the currently saved buffer and the supplied gradients is
+        computed on each call, saving the result in the buffer.
+
+        Args:
+            target_layers (torch.nn.Module, torch.Tensor or sequence of them): Layers
+                or tensors on which the metrics will be registered as backward hooks.
+                For ``torch.nn.Module`` instances a single metric instance will be
+                registered to all parameters returned by
+                ``torch.nn.Module.parameters()``, thus computing the metric over all
+                parameters of the Module.
+            grad_transform (Optional[Callable[[torch.Tensor], torch.Tensor]], optional):
+                A callable which accepts a ``torch.Tensor`` as input and returns a
+                ``torch.Tensor``. The callable is applied to the gradient before it is
+                handed over to the ``_collect`` method of a ``GradientMetric`` instance.
+        """
         super().__init__(target_layers=target_layers, grad_transform=grad_transform)
         self._metric_buffer: torch.Tensor
         self.reset()
@@ -210,13 +256,6 @@ class Max(GradientMetric):
 
 
 class Mean(GradientMetric):
-    """Computes the mean of the supplied gradients.
-
-    The buffer always holds the mean of all previously supplied gradients.
-    This exists besides :class:`~gradient_metrics.metrics.MeanStd` to reduce
-    computation cost if you do not want to computed the standard deviation.
-    """
-
     def __init__(
         self,
         target_layers: Union[
@@ -224,6 +263,24 @@ class Mean(GradientMetric):
         ],
         grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     ) -> None:
+        """Computes the mean of the supplied gradients.
+
+        The buffer always holds the mean of all previously supplied gradients.
+        This exists besides :class:`~gradient_metrics.metrics.MeanStd` to reduce
+        computation cost if you do not want to computed the standard deviation.
+
+        Args:
+            target_layers (torch.nn.Module, torch.Tensor or sequence of them): Layers
+                or tensors on which the metrics will be registered as backward hooks.
+                For ``torch.nn.Module`` instances a single metric instance will be
+                registered to all parameters returned by
+                ``torch.nn.Module.parameters()``, thus computing the metric over all
+                parameters of the Module.
+            grad_transform (Optional[Callable[[torch.Tensor], torch.Tensor]], optional):
+                A callable which accepts a ``torch.Tensor`` as input and returns a
+                ``torch.Tensor``. The callable is applied to the gradient before it is
+                handed over to the ``_collect`` method of a ``GradientMetric`` instance.
+        """
         super().__init__(target_layers=target_layers, grad_transform=grad_transform)
         self._metric_buffer: torch.Tensor
         self._count: int
@@ -267,6 +324,16 @@ class MeanStd(GradientMetric):
         is equal to ``eps``. This is also the lower bound for the standard deviation.
 
         Args:
+            target_layers (torch.nn.Module, torch.Tensor or sequence of them): Layers
+                or tensors on which the metrics will be registered as backward hooks.
+                For ``torch.nn.Module`` instances a single metric instance will be
+                registered to all parameters returned by
+                ``torch.nn.Module.parameters()``, thus computing the metric over all
+                parameters of the Module.
+            grad_transform (Optional[Callable[[torch.Tensor], torch.Tensor]], optional):
+                A callable which accepts a ``torch.Tensor`` as input and returns a
+                ``torch.Tensor``. The callable is applied to the gradient before it is
+                handed over to the ``_collect`` method of a ``GradientMetric`` instance.
             return_mean (bool, optional): Whether to return the mean or not.
                 Defaults to True.
             eps (float, optional): Small epsilon for gradients with very small standard
