@@ -1,6 +1,5 @@
-from functools import partial
-
-from gradient_metrics import GradientMetricCollector, metrics
+from gradient_metrics import GradientMetricCollector
+from gradient_metrics.metrics import Max, Min, PNorm
 import torch
 import torch.nn as nn
 
@@ -57,12 +56,20 @@ if __name__ == "__main__":
     # the feature extractor and the fully connected part
     # We use Max, Min and PNorm with p=2
     mcollector = GradientMetricCollector(
-        (net, net.features, net.fc),
-        (
-            metrics.Max,
-            metrics.Min,
-            partial(metrics.PNorm, p=2),
-        ),
+        [
+            # Extract metrics from the whole network
+            Max(net),
+            Min(net),
+            PNorm(net, p=2),
+            # Extract metrics from the feature extraction part
+            Max(net.features),
+            Min(net.features),
+            PNorm(net.features, p=2),
+            # Extract metrics from the fully connected part
+            Max(net.fc),
+            Min(net.fc),
+            PNorm(net.fc, p=2),
+        ]
     )
 
     # predict the dummy data
@@ -84,3 +91,17 @@ if __name__ == "__main__":
     # 3 metrics over the feature part
     # 3 metrics over the fully connected part
     print(f"Shape of the gradient metric output: {grad_metrics.shape}")
+
+    # Now let's say we want to have the minimum and maximum of the absolute gradient
+    # values in the first convolution's kernel. We can achieve that by using a
+    # `grad_transform`:
+    mcollector = GradientMetricCollector(
+        [
+            Min(net.features[0].weight, grad_transform=lambda grad: grad.abs()),
+            Max(net.features[0].weight, grad_transform=lambda grad: grad.abs()),
+        ]
+    )
+
+    grad_metrics = mcollector(loss)
+
+    print(f"Value range of absolute gradient values:\n{grad_metrics}")
