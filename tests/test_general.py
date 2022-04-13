@@ -1,5 +1,3 @@
-from functools import partial
-import gc
 from pathlib import Path
 
 import gradient_metrics
@@ -30,10 +28,10 @@ def test_gradientmetriccollector_inputs():
     eps = 1e-16
 
     with pytest.raises(ValueError):
-        metric_collector = GradientMetricCollector(target_layers=parameter, metrics=[])
+        metric_collector = GradientMetricCollector(metrics=[])
 
     metric_collector = GradientMetricCollector(
-        target_layers=parameter, metrics=[Max, partial(MeanStd, eps=eps), Min]
+        metrics=[Max(parameter), MeanStd(parameter, eps=eps), Min(parameter)]
     )
 
     # Raise ValueError if loss does not requires gradient
@@ -44,19 +42,16 @@ def test_gradientmetriccollector_inputs():
     with pytest.raises(ValueError):
         metric_collector(torch.ones((1, 1), requires_grad=True))
 
-    # Check if backward hooks get removed on deletion
-    # Garbage collector needs to be invoked explicitely
-    del metric_collector
-    gc.collect()
-    assert len(parameter._backward_hooks) == 0
-
 
 def test_gradientmetriccollector():
     parameter = torch.ones((3,), requires_grad=True)
     eps = 1e-16
     metric_collector = GradientMetricCollector(
-        target_layers=parameter, metrics=[Max, partial(MeanStd, eps=eps), Min]
+        metrics=[Max(parameter), MeanStd(parameter, eps=eps), Min(parameter)]
     )
+
+    # target layers should only contain the parameter defined above once
+    assert len(metric_collector.target_layers) == 1
 
     loss = (parameter * torch.full(((2, 3)), 1.0)).sum(1)
 
@@ -65,9 +60,7 @@ def test_gradientmetriccollector():
     assert torch.all(metrics[0] == torch.tensor([1.0, 1.0, eps, 1.0]))
     assert metric_collector.dim == 4
 
-    metric_collector = GradientMetricCollector(
-        target_layers=parameter, metrics=partial(MeanStd, eps=eps)
-    )
+    metric_collector = GradientMetricCollector(metrics=MeanStd(parameter, eps=eps))
 
     samples = torch.tensor([-1.0, 0.0, 1.0]).view(1, -1).repeat((2, 1))
 
@@ -80,7 +73,7 @@ def test_gradientmetriccollector():
     linear_layer = torch.nn.Linear(3, 3, bias=True)
     linear_layer.weight.data.fill_(torch.tensor(2.0))
     linear_layer.bias.data.zero_()
-    metric_collector = GradientMetricCollector(linear_layer, [Max, Min])
+    metric_collector = GradientMetricCollector([Max(linear_layer), Min(linear_layer)])
     assert metric_collector.dim == 2
 
     loss = linear_layer(torch.ones((1, 3))).sum(1)
