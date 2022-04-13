@@ -91,3 +91,17 @@ if __name__ == "__main__":
     # 3 metrics over the feature part
     # 3 metrics over the fully connected part
     print(f"Shape of the gradient metric output: {grad_metrics.shape}")
+
+    # Now let's say we want to have the minimum and maximum of the absolute gradient
+    # values in the first convolution's kernel. We can achieve that by using a
+    # `grad_transform`:
+    mcollector = GradientMetricCollector(
+        [
+            Min(net.features[0].weight, grad_transform=lambda grad: grad.abs()),
+            Max(net.features[0].weight, grad_transform=lambda grad: grad.abs()),
+        ]
+    )
+
+    grad_metrics = mcollector(loss)
+
+    print(f"Value range of absolute gradient values:\n{grad_metrics}")
