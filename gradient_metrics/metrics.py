@@ -1,4 +1,4 @@
-from typing import List, Sequence, Union
+from typing import Callable, List, Optional, Sequence, Union
 
 import torch
 import torch.nn as nn
@@ -11,6 +11,7 @@ class GradientMetric(object):
         target_layers: Union[
             Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
         ],
+        grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     ) -> None:
         self.hook_handles: List[RemovableHandle] = []
         self.target_layers = (
@@ -18,6 +19,7 @@ class GradientMetric(object):
             if isinstance(target_layers, (nn.Module, torch.Tensor))
             else tuple(target_layers)
         )
+        self.grad_transform = grad_transform
         self._register()
 
     def __call__(self, grad: torch.Tensor) -> None:
@@ -29,6 +31,8 @@ class GradientMetric(object):
             grad (torch.Tensor): The gradient of the associated parameter. On this the
                 metric is going to be computed.
         """
+        if self.grad_transform is not None:
+            grad = self.grad_transform(grad)
         self._collect(grad)
 
     def __del__(self) -> None:
@@ -94,6 +98,7 @@ class PNorm(GradientMetric):
         target_layers: Union[
             Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
         ],
+        grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
         p: int = 1,
         eps: float = 1e-16,
     ) -> None:
@@ -112,7 +117,7 @@ class PNorm(GradientMetric):
             ValueError: If p is smaller or equal to zero.
             ValueError: If eps is smaller or equal to zero.
         """
-        super().__init__(target_layers=target_layers)
+        super().__init__(target_layers=target_layers, grad_transform=grad_transform)
 
         if not 0 < p < float("inf"):
             raise ValueError(f"p has to be in (0, inf), got {p}")
@@ -154,8 +159,9 @@ class Min(GradientMetric):
         target_layers: Union[
             Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
         ],
+        grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     ) -> None:
-        super().__init__(target_layers=target_layers)
+        super().__init__(target_layers=target_layers, grad_transform=grad_transform)
         self._metric_buffer: torch.Tensor
         self.reset()
 
@@ -184,8 +190,9 @@ class Max(GradientMetric):
         target_layers: Union[
             Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
         ],
+        grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     ) -> None:
-        super().__init__(target_layers=target_layers)
+        super().__init__(target_layers=target_layers, grad_transform=grad_transform)
         self._metric_buffer: torch.Tensor
         self.reset()
 
@@ -215,8 +222,9 @@ class Mean(GradientMetric):
         target_layers: Union[
             Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
         ],
+        grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
     ) -> None:
-        super().__init__(target_layers=target_layers)
+        super().__init__(target_layers=target_layers, grad_transform=grad_transform)
         self._metric_buffer: torch.Tensor
         self._count: int
         self.reset()
@@ -246,6 +254,7 @@ class MeanStd(GradientMetric):
         target_layers: Union[
             Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
         ],
+        grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
         return_mean: bool = True,
         eps: float = 1e-16,
     ) -> None:
@@ -267,7 +276,7 @@ class MeanStd(GradientMetric):
         Raises:
             ValueError: If eps is smaller or equal to zero.
         """
-        super().__init__(target_layers=target_layers)
+        super().__init__(target_layers=target_layers, grad_transform=grad_transform)
 
         if not eps > 0:
             raise ValueError(f"eps has to be greater than zero, got {eps}")
