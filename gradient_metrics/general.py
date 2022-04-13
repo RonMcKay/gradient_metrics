@@ -1,4 +1,4 @@
-from typing import Sequence, Set, Union
+from typing import List, Sequence, Union
 
 from gradient_metrics.metrics import GradientMetric
 import torch
@@ -30,11 +30,13 @@ class GradientMetricCollector(object):
         self.metrics = (
             tuple(metrics) if isinstance(metrics, (list, tuple)) else (metrics,)
         )
-        self.target_layers: Set[Union[nn.Module, torch.Tensor]] = set()
+        self.target_layers: List[Union[nn.Module, torch.Tensor]] = []
 
         # collect all parameters for zeroing gradients
+        t_layers = set()
         for m in self.metrics:
-            self.target_layers.update(m.target_layers)
+            t_layers.update(m.target_layers)
+        self.target_layers = list(t_layers)
 
         if len(self.metrics) == 0:
             raise ValueError("No metrics specified!")
