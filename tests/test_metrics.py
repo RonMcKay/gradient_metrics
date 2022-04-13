@@ -52,6 +52,11 @@ def test_max():
     loss.backward()
     assert metric.data == torch.tensor(2.0)
 
+    metric = Max(parameter, grad_transform=lambda grad: torch.tensor(-1.0))
+    loss = parameter * torch.tensor(2.0)
+    loss.backward()
+    assert metric.data == torch.tensor(-1.0)
+
 
 def test_min():
     parameter = torch.ones((1,), requires_grad=True)
@@ -74,6 +79,11 @@ def test_min():
     loss.backward()
     assert metric.data == torch.tensor(0.0)
 
+    metric = Min(parameter, grad_transform=lambda grad: torch.tensor(100.0))
+    loss = parameter * torch.tensor(0.0)
+    loss.backward()
+    assert metric.data == torch.tensor(100.0)
+
 
 def test_pnorm():
     parameter = torch.ones((3,), requires_grad=True)
@@ -82,6 +92,16 @@ def test_pnorm():
     loss = (parameter * torch.ones_like(parameter)).sum()
     loss.backward()
     assert metric.data == torch.tensor(3.0)
+
+    metric = PNorm(parameter, grad_transform=lambda grad: torch.tensor(100.0))
+    loss = (parameter * torch.tensor(0.0)).sum()
+    loss.backward()
+    assert metric.data == torch.tensor(100.0)
+
+    metric = PNorm(parameter, grad_transform=lambda grad: torch.tensor([100, 100]), p=2)
+    loss = (parameter * torch.tensor(1.0)).sum()
+    loss.backward()
+    assert metric.data == torch.tensor(20000**0.5)
 
 
 def test_mean():
@@ -100,6 +120,11 @@ def test_mean():
     loss = (parameter * torch.tensor([-1.0, 0.0, 1.0])).sum()
     loss.backward()
     assert metric.data == torch.tensor(0.0)
+
+    metric = Mean(parameter, grad_transform=lambda grad: torch.tensor(1))
+    loss = (parameter * torch.tensor(0.0)).sum()
+    loss.backward()
+    assert metric.data == torch.tensor(1)
 
 
 def test_meanstd():
@@ -128,3 +153,8 @@ def test_meanstd():
     loss = parameter * torch.tensor(2.0)
     loss.backward()
     assert metric.data == torch.tensor(eps)
+
+    metric = MeanStd(parameter, grad_transform=lambda grad: torch.tensor(1))
+    loss = (parameter * torch.tensor(0.0)).sum()
+    loss.backward()
+    assert torch.all(metric.data == torch.tensor([1, eps]))
