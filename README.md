@@ -4,15 +4,76 @@
 
 </div>
 
+This package implements utilities for computing gradient metrics for measuring uncertainties in neural networks based on the paper "[Classification Uncertainty of Deep Neural Networks Based on Gradient Information, Oberdiek et al., 2018][1]".  
+An application of this can also be found in "[On the Importance of Gradients for Detecting Distributional Shifts in the Wild, Huang et al., 2021][2]"
+
+Documentation and examples can be found on [GitHub pages](https://ronmckay.github.io/gradient_metrics/).
+
 # Installation
 
 ```python
 pip install gradient-metrics
 ```
 
-This package implements utilities for computing gradient metrics for measuring uncertainties in neural networks based on the paper "[Classification Uncertainty of Deep Neural Networks Based on Gradient Information](https://arxiv.org/abs/1805.08440)".
+# Usage
 
-Documentation and examples can be found on [GitHub pages](https://ronmckay.github.io/gradient_metrics/).
+Example of computing the maximum, minimum, mean and standard deviation of gradient entries as in [Classification Uncertainty of Deep Neural Networks Based on Gradient Information][1]:
+
+```python
+from gradient_metrics import GradientMetricCollector
+from gradient_metrics.metrics import Max, Min, MeanStd
+import torch.nn.functional as tfunc
+
+# Initialize a network
+mynet = MyNeuralNetwork()
+
+# Initialize the GradientMetricCollector
+mcollector = GradientMetricCollector(
+    [
+        Max(mynet),
+        Min(mynet),
+        MeanStd(mynet),
+    ]
+)
+
+# Predict your data
+out = mynet(x)
+
+# Construct pseudo labels
+y_pred = out.argmax(1).clone().detach()
+
+# Construct the sample wise loss for backpropagation
+sample_loss = tfunc.binary_cross_entropy_with_logits(out, y_pred, reduction="none")
+
+# Compute the gradient metrics
+metrics = mcollector(sample_loss)
+```
+
+----
+
+Example of computing the L1-Norm from [On the Importance of Gradients for Detecting Distributional Shifts in the Wild][2]:
+
+```python
+from gradient_metrics import GradientMetricCollector
+from gradient_metrics.metrics import PNorm
+import torch
+import torch.nn.functional as tfunc
+
+# Initialize a network
+mynet = MyNeuralNetwork()
+
+# Initialize the GradientMetricCollector
+mcollector = GradientMetricCollector(PNorm(mynet))
+
+# Predict your data
+out = mynet(x)
+
+# Construct the sample wise loss for backpropagation
+sample_loss = torch.log(tfunc.softmax(out, dim=1)).mean(1).neg()
+
+# Compute the gradient metrics
+metrics = mcollector(sample_loss)
+```
 
 # Citing
 
@@ -35,3 +96,6 @@ Documentation and examples can be found on [GitHub pages](https://ronmckay.githu
   url       = { https://doi.org/10.1007/978-3-319-99978-4_9 },  
   doi       = { 10.1007/978-3-319-99978-4\_9 },  
 }
+
+[1]: https://arxiv.org/abs/1805.08440 "Classification Uncertainty of Deep Neural Networks Based on Gradient Information, Oberdiek et al., 2018"
+[2]: https://proceedings.neurips.cc/paper/2021/hash/063e26c670d07bb7c4d30e6fc69fe056-Abstract.html "On the Importance of Gradients for Detecting Distributional Shifts in the Wild, Huang et al., 2021"
