@@ -11,7 +11,7 @@ Documentation and examples can be found on [GitHub pages](https://ronmckay.githu
 
 # Installation
 
-```python
+```
 pip install gradient-metrics
 ```
 
@@ -43,7 +43,7 @@ out = mynet(x)
 y_pred = out.argmax(1).clone().detach()
 
 # Construct the sample wise loss for backpropagation
-sample_loss = tfunc.binary_cross_entropy_with_logits(out, y_pred, reduction="none")
+sample_loss = tfunc.cross_entropy(out, y_pred, reduction="none")
 
 # Compute the gradient metrics
 metrics = mcollector(sample_loss)
@@ -77,6 +77,7 @@ metrics = mcollector(sample_loss)
 
 # Citing
 
+```txt
 @inproceedings{OberdiekRG18,  
   author    = {Philipp Oberdiek and  
                Matthias Rottmann and  
@@ -96,6 +97,7 @@ metrics = mcollector(sample_loss)
   url       = { https://doi.org/10.1007/978-3-319-99978-4_9 },  
   doi       = { 10.1007/978-3-319-99978-4\_9 },  
 }
+```
 
 [1]: https://arxiv.org/abs/1805.08440 "Classification Uncertainty of Deep Neural Networks Based on Gradient Information, Oberdiek et al., 2018"
 [2]: https://proceedings.neurips.cc/paper/2021/hash/063e26c670d07bb7c4d30e6fc69fe056-Abstract.html "On the Importance of Gradients for Detecting Distributional Shifts in the Wild, Huang et al., 2021"
