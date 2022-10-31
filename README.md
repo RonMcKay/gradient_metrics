@@ -11,7 +11,7 @@ Documentation and examples can be found on [GitHub pages](https://ronmckay.githu
 
 # Installation
 
-```
+```bash
 pip install gradient-metrics
 ```
 
@@ -75,6 +75,21 @@ sample_loss = torch.log(tfunc.softmax(out, dim=1)).mean(1).neg()
 metrics = mcollector(sample_loss)
 ```
 
+# Contributing
+
+**Requirements:**
+- Python 3.7 or higher
+- [poetry]
+- [make]
+
+Contributions in the form of PRs or issues are welcome. To install the development environment run
+
+```bash
+make setup
+```
+
+We are using [commitizen] to automate the version bumping and changelog generation. In order for this to work properly, contributors need to adhere to the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) styling. This will be enforced using [pre-commit] hooks. To easier write commit messages that adhere to this style, we recommend to use `cz commit` (will be installed by [poetry] alongside the other development dependencies). Run `cz example` to see the format of an example commit message.
+
 # Citing
 
 ```txt
@@ -101,3 +116,8 @@ metrics = mcollector(sample_loss)
 
 [1]: https://arxiv.org/abs/1805.08440 "Classification Uncertainty of Deep Neural Networks Based on Gradient Information, Oberdiek et al., 2018"
 [2]: https://proceedings.neurips.cc/paper/2021/hash/063e26c670d07bb7c4d30e6fc69fe056-Abstract.html "On the Importance of Gradients for Detecting Distributional Shifts in the Wild, Huang et al., 2021"
+
+[commitizen]: https://commitizen-tools.github.io/commitizen/
+[make]: https://www.gnu.org/software/make/
+[poetry]: https://python-poetry.org/
+[pre-commit]: https://pre-commit.com/
