@@ -11,6 +11,7 @@ homepage = "https://github.com/RonMcKay/gradient_metrics"
 repository = "https://github.com/RonMcKay/gradient_metrics"
 description = "Neural Network Gradient Metrics with PyTorch"
 authors = ["Philipp Oberdiek <git@oberdiek.net>"]
+documentation = "https://ronmckay.github.io/gradient_metrics/"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4"
@@ -59,3 +60,4 @@ version_files = [
 update_changelog_on_bump = true
 changelog_incremental = true
 annotated_tag = true
+use_shortcuts = true
