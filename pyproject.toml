@@ -50,7 +50,7 @@ line_length = 88
 known_third_party = ["gradient_metrics"]
 
 [tool.commitizen]
-name = "cz_conventional_commits"
+name = "cz_conventional_commits_ronmckay"
 version = "0.2.0"
 tag_format = "v$version"
 major_version_zero = true
@@ -61,3 +61,4 @@ update_changelog_on_bump = true
 changelog_incremental = true
 annotated_tag = true
 use_shortcuts = true
+bump_message = "bump: Version $current_version → $new_version"
