@@ -19,6 +19,7 @@ docs:
 	(cd docs/; poetry run make html)
 
 test: test-flake8 test-black test-isort test-mypy test-pytest
+	@echo "All tests passed successfully!"
 
 test-mypy:
 	@echo "Testing with mypy..."
