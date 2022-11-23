@@ -1,4 +1,4 @@
-.PHONY: all setup pre-commit install test clean build docs test-format test-format-flake8 test-format-black test-format-isort format
+.PHONY: all setup pre-commit install test clean build docs test test-flake8 test-black test-isort format
 
 setup: install pre-commit
 
@@ -18,21 +18,25 @@ build: docs
 docs:
 	(cd docs/; poetry run make html)
 
-test: test-format
+test: test-flake8 test-black test-isort test-mypy test-pytest
+
+test-mypy:
+	@echo "Testing with mypy..."
 	poetry run mypy gradient_metrics
+
+test-pytest:
+	@echo "Testing with pytest..."
 	poetry run pytest --cov=gradient_metrics/ --cov-report=term-missing --cov-fail-under=90 tests
 
-test-format: test-format-flake8 test-format-black test-format-isort
-
-test-format-flake8:
+test-flake8:
 	@echo "Checking format with flake8..."
 	poetry run flake8 . --count --statistics
 
-test-format-black:
+test-black:
 	@echo "Checking format with black..."
 	poetry run black --check gradient_metrics tests
 
-test-format-isort:
+test-isort:
 	@echo "Checking format with isort..."
 	poetry run isort --check --settings-path pyproject.toml gradient_metrics tests
 

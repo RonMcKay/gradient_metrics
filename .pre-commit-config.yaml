@@ -9,21 +9,21 @@ repos:
     hooks:
       - id: system
         name: Code Style Check (black)
-        entry: make test-format-black
+        entry: make test-black
         language: system
         pass_filenames: false
         stages:
           - commit
       - id: system
         name: Code Style Check (flake8)
-        entry: make test-format-flake8
+        entry: make test-flake8
         language: system
         pass_filenames: false
         stages:
           - commit
       - id: system
         name: Code Style Check (isort)
-        entry: make test-format-isort
+        entry: make test-isort
         language: system
         pass_filenames: false
         stages:
