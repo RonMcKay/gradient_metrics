@@ -11,22 +11,25 @@ homepage = "https://github.com/RonMcKay/gradient_metrics"
 repository = "https://github.com/RonMcKay/gradient_metrics"
 description = "Neural Network Gradient Metrics with PyTorch"
 authors = ["Philipp Oberdiek <git@oberdiek.net>"]
+documentation = "https://ronmckay.github.io/gradient_metrics/"
 
 [tool.poetry.dependencies]
-python = ">=3.6.2,<4"
-numpy = "*"
-torch = ">=1.4.0"
+python = ">=3.7,<4"
+numpy = "^1.21.1"
+torch = "^1.4.0"
 
-[tool.poetry.dev-dependencies]
-flake8 = "^3.9.2"
-isort = "^5.10.1"
-mypy = "^0.942"
-pytest = "^7.0.1"
-pytest-cov = "^3.0.0"
-tox = "^3.24.5"
-black = "^22.3.0"
-Sphinx = "^4.5.0"
+[tool.poetry.group.dev.dependencies]
+flake8 = "^5.0.4"
+isort = "^5"
+mypy = "^0.982"
+pytest = "^7.2.0"
+pytest-cov = "^4.0.0"
+tox = "^3.27.0"
+black = "^22.10.0"
+sphinx = "^4.3.2"
 sphinx-rtd-theme = "^1.0.0"
+commitizen = "^2.37.0"
+pre-commit = "^2.20.0"
 
 [tool.mypy]
 disallow_untyped_defs = true
@@ -45,3 +48,17 @@ profile = "black"
 force_sort_within_sections = true
 line_length = 88
 known_third_party = ["gradient_metrics"]
+
+[tool.commitizen]
+name = "cz_conventional_commits_ronmckay"
+version = "0.2.0"
+tag_format = "v$version"
+major_version_zero = true
+version_files = [
+    "pyproject.toml:^version"
+]
+update_changelog_on_bump = true
+changelog_incremental = true
+annotated_tag = true
+use_shortcuts = true
+bump_message = "bump: Version $current_version → $new_version"

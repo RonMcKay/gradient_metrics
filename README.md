@@ -1,6 +1,6 @@
 <div align="center">
 
-[![PyPI](https://img.shields.io/pypi/v/gradient-metrics)](https://pypi.org/project/gradient-metrics/) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/ronmckay/gradient_metrics/Publish%20to%20PyPI/main) [![](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black) [![PyPI - License](https://img.shields.io/pypi/l/gradient-metrics)](https://github.com/RonMcKay/gradient_metrics/blob/main/LICENSE) ![PyPI - Downloads](https://img.shields.io/pypi/dm/gradient-metrics)
+[![PyPI](https://img.shields.io/pypi/v/gradient-metrics)](https://pypi.org/project/gradient-metrics/) ![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/ronmckay/gradient_metrics/publish-to-pypi.yml?branch=main) [![](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black) [![PyPI - License](https://img.shields.io/pypi/l/gradient-metrics)](https://github.com/RonMcKay/gradient_metrics/blob/main/LICENSE) ![PyPI - Downloads](https://img.shields.io/pypi/dm/gradient-metrics)
 
 </div>
 
@@ -9,9 +9,16 @@ An application of this can also be found in "[On the Importance of Gradients for
 
 Documentation and examples can be found on [GitHub pages](https://ronmckay.github.io/gradient_metrics/).
 
+# Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Citing](#citing)
+
 # Installation
 
-```python
+```bash
 pip install gradient-metrics
 ```
 
@@ -43,7 +50,7 @@ out = mynet(x)
 y_pred = out.argmax(1).clone().detach()
 
 # Construct the sample wise loss for backpropagation
-sample_loss = tfunc.binary_cross_entropy_with_logits(out, y_pred, reduction="none")
+sample_loss = tfunc.cross_entropy(out, y_pred, reduction="none")
 
 # Compute the gradient metrics
 metrics = mcollector(sample_loss)
@@ -75,8 +82,24 @@ sample_loss = torch.log(tfunc.softmax(out, dim=1)).mean(1).neg()
 metrics = mcollector(sample_loss)
 ```
 
+# Contributing
+
+**Requirements:**
+- Python 3.7 or higher
+- [poetry]
+- [make]
+
+Contributions in the form of PRs or issues are welcome. To install the development environment run
+
+```bash
+make setup
+```
+
+We are using [commitizen] to automate the version bumping and changelog generation. In order for this to work properly, contributors need to adhere to the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) styling. This will be enforced using [pre-commit] hooks. To easier write commit messages that adhere to this style, we recommend to use `cz commit` (will be installed by [poetry] alongside the other development dependencies). Run `cz example` to see the format of an example commit message.
+
 # Citing
 
+```txt
 @inproceedings{OberdiekRG18,  
   author    = {Philipp Oberdiek and  
                Matthias Rottmann and  
@@ -96,6 +119,12 @@ metrics = mcollector(sample_loss)
   url       = { https://doi.org/10.1007/978-3-319-99978-4_9 },  
   doi       = { 10.1007/978-3-319-99978-4\_9 },  
 }
+```
 
 [1]: https://arxiv.org/abs/1805.08440 "Classification Uncertainty of Deep Neural Networks Based on Gradient Information, Oberdiek et al., 2018"
 [2]: https://proceedings.neurips.cc/paper/2021/hash/063e26c670d07bb7c4d30e6fc69fe056-Abstract.html "On the Importance of Gradients for Detecting Distributional Shifts in the Wild, Huang et al., 2021"
+
+[commitizen]: https://commitizen-tools.github.io/commitizen/
+[make]: https://www.gnu.org/software/make/
+[poetry]: https://python-poetry.org/
+[pre-commit]: https://pre-commit.com/
