@@ -9,6 +9,13 @@ An application of this can also be found in "[On the Importance of Gradients for
 
 Documentation and examples can be found on [GitHub pages](https://ronmckay.github.io/gradient_metrics/).
 
+# Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Citing](#citing)
+
 # Installation
 
 ```bash
