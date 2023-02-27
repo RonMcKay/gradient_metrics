@@ -113,7 +113,7 @@ class PNorm(GradientMetric):
             Sequence[Union[nn.Module, torch.Tensor]], nn.Module, torch.Tensor
         ],
         grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
-        p: int = 1,
+        p: float = 1.0,
     ) -> None:
         r"""Computes the p-norm over the flattened gradients.
 
@@ -131,16 +131,28 @@ class PNorm(GradientMetric):
                 A callable which accepts a ``torch.Tensor`` as input and returns a
                 ``torch.Tensor``. The callable is applied to the gradient before it is
                 handed over to the ``_collect`` method of a ``GradientMetric`` instance.
-            p (int, optional): Power of the norm. Defaults to 1 (absolute-value norm).
+            p (float optional): Power of the norm. Defaults to 1 (absolute-value norm).
 
         Raises:
-            ValueError: If p is smaller or equal to zero.
+            ValueError: If p is not in the interval (0,inf].
         """
         super().__init__(target_layers=target_layers, grad_transform=grad_transform)
 
-        if not 0 < p < float("inf"):
-            raise ValueError(f"p has to be in (0, inf), got {p}")
-        self.p = float(p)
+        try:
+            p = float(p)
+        except ValueError:
+            raise ValueError(
+                "Parameter 'p' should either be a float in the interval (0,inf] "
+                f"or the string 'inf', found '{p}'"
+            )
+
+        if p <= 0:
+            raise ValueError(
+                "Parameter 'p' should either be a float in the interval (0,inf] "
+                f"or the string 'inf', found '{p}'"
+            )
+
+        self.p = p
 
         self._metric_buffer: torch.Tensor
         self.reset()
@@ -149,10 +161,29 @@ class PNorm(GradientMetric):
         if self._metric_buffer.device != grad.device:
             self._metric_buffer = self._metric_buffer.to(grad.device)
 
-        self._metric_buffer = torch.pow(
-            self._metric_buffer.pow(self.p) + grad.view(-1).abs().pow(self.p).sum(),
-            1.0 / self.p,
-        )
+        self._update_metric_buffer(grad)
+
+    def _update_metric_buffer(self, grad: torch.Tensor) -> None:
+        if self.p == float("inf"):
+            self._metric_buffer = self.__compute_sup_norm_update(
+                self._metric_buffer, grad
+            )
+        else:
+            self._metric_buffer = self.__compute_p_norm_update(
+                self._metric_buffer, grad, self.p
+            )
+
+    @staticmethod
+    def __compute_p_norm_update(
+        buffer: torch.Tensor, update: torch.Tensor, p: float
+    ) -> torch.Tensor:
+        return torch.pow(buffer.pow(p) + update.flatten().abs().pow(p).sum(), 1.0 / p)
+
+    @staticmethod
+    def __compute_sup_norm_update(
+        buffer: torch.Tensor, update: torch.Tensor
+    ) -> torch.Tensor:
+        return torch.max(buffer, update.flatten().abs().max())
 
     def _get_metric(self) -> torch.Tensor:
         return self._metric_buffer
