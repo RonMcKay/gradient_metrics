@@ -24,9 +24,9 @@ def test_baseclass():
 @pytest.mark.parametrize(
     ["metric_class", "kwargs", "error_type"],
     [
-        (PNorm, dict(p=float("inf")), ValueError),
-        (PNorm, dict(eps=-1.0), ValueError),
-        (PNorm, dict(eps=0.0), ValueError),
+        (PNorm, dict(p=0), ValueError),
+        (PNorm, dict(p=-1.0), ValueError),
+        (PNorm, dict(p="test"), ValueError),
         (MeanStd, dict(eps=-1.0), ValueError),
         (MeanStd, dict(eps=0.0), ValueError),
     ],
@@ -97,6 +97,16 @@ def test_pnorm():
     loss = (parameter * torch.tensor(0.0)).sum()
     loss.backward()
     assert metric.data == torch.tensor(100.0)
+
+    metric = PNorm(parameter, p=float("inf"))
+    loss = (parameter * torch.tensor(-2.0)).sum()
+    loss.backward()
+    assert metric.data == torch.tensor(2.0)
+
+    metric = PNorm(parameter, p=float("inf"))
+    loss = (parameter * torch.tensor(2.0)).sum()
+    loss.backward()
+    assert metric.data == torch.tensor(2.0)
 
     metric = PNorm(parameter, grad_transform=lambda grad: torch.tensor([100, 100]), p=2)
     loss = (parameter * torch.tensor(1.0)).sum()
