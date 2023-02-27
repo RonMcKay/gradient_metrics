@@ -114,7 +114,6 @@ class PNorm(GradientMetric):
         ],
         grad_transform: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
         p: int = 1,
-        eps: float = 1e-16,
     ) -> None:
         r"""Computes the p-norm over the flattened gradients.
 
@@ -133,23 +132,15 @@ class PNorm(GradientMetric):
                 ``torch.Tensor``. The callable is applied to the gradient before it is
                 handed over to the ``_collect`` method of a ``GradientMetric`` instance.
             p (int, optional): Power of the norm. Defaults to 1 (absolute-value norm).
-            eps (float, optional): Small epsilon for gradients with very small vector
-                norms which would otherwise result in a possible division by zero in
-                the second order derivatives. Defaults to 1e-16.
 
         Raises:
             ValueError: If p is smaller or equal to zero.
-            ValueError: If eps is smaller or equal to zero.
         """
         super().__init__(target_layers=target_layers, grad_transform=grad_transform)
 
         if not 0 < p < float("inf"):
             raise ValueError(f"p has to be in (0, inf), got {p}")
         self.p = float(p)
-
-        if not eps > 0:
-            raise ValueError(f"eps has to be greater than zero, got {eps}")
-        self.eps = eps
 
         self._metric_buffer: torch.Tensor
         self.reset()
