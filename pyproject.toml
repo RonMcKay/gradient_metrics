@@ -14,22 +14,23 @@ authors = ["Philipp Oberdiek <git@oberdiek.net>"]
 documentation = "https://ronmckay.github.io/gradient_metrics/"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4"
+python = ">=3.7,<3.11"
 numpy = "^1.21.1"
 torch = "^1.4.0"
 
 [tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+commitizen = "^2.37.0"
 flake8 = "^5.0.4"
 isort = "^5"
 mypy = "^0.982"
+pre-commit = "^2.20.0"
 pytest = "^7.2.0"
 pytest-cov = "^4.0.0"
-tox = "^3.27.0"
-black = "^22.10.0"
 sphinx = "^4.3.2"
 sphinx-rtd-theme = "^1.0.0"
-commitizen = "^2.37.0"
-pre-commit = "^2.20.0"
+toml = "^0.10.2"
+tox = "^3.27.0"
 
 [tool.mypy]
 disallow_untyped_defs = true
