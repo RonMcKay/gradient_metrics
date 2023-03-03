@@ -58,6 +58,12 @@ def test_max():
     loss.backward()
     assert metric.data == torch.tensor(-1.0)
 
+    parameter = torch.ones((1,), requires_grad=True, device="meta")
+    metric = Max(parameter)
+    loss = parameter * torch.tensor(2.0, device="meta")
+    metric(autograd.grad(loss, parameter))
+    assert metric.data.device == torch.device("meta")
+
 
 def test_min():
     parameter = torch.ones((1,), requires_grad=True)
@@ -84,6 +90,12 @@ def test_min():
     loss = parameter * torch.tensor(0.0)
     loss.backward()
     assert metric.data == torch.tensor(100.0)
+
+    parameter = torch.ones((1,), requires_grad=True, device="meta")
+    metric = Min(parameter)
+    loss = parameter * torch.tensor(0.0, device="meta")
+    metric(autograd.grad(loss, parameter))
+    assert metric.data.device == torch.device("meta")
 
 
 def test_pnorm():
@@ -114,6 +126,12 @@ def test_pnorm():
     loss.backward()
     assert metric.data == torch.tensor(20000**0.5)
 
+    parameter = torch.ones((3,), requires_grad=True, device="meta")
+    metric = PNorm(parameter)
+    loss = (parameter * torch.tensor(2.0, device="meta")).sum()
+    metric(autograd.grad(loss, parameter))
+    assert metric.data.device == torch.device("meta")
+
 
 def test_mean():
     parameter = torch.ones((3,), requires_grad=True)
@@ -136,6 +154,12 @@ def test_mean():
     loss = (parameter * torch.tensor(0.0)).sum()
     loss.backward()
     assert metric.data == torch.tensor(1)
+
+    parameter = torch.ones((3,), requires_grad=True, device="meta")
+    metric = Mean(parameter)
+    loss = (parameter * torch.tensor([-1.0, 0.0, 1.0], device="meta")).sum()
+    metric(autograd.grad(loss, parameter))
+    assert metric.data.device == torch.device("meta")
 
 
 def test_meanstd():
@@ -169,3 +193,9 @@ def test_meanstd():
     loss = (parameter * torch.tensor(0.0)).sum()
     loss.backward()
     assert torch.all(metric.data == torch.tensor([1, eps]))
+
+    parameter = torch.ones((1,), requires_grad=True, device="meta")
+    metric = MeanStd(parameter, eps=eps)
+    loss = parameter * torch.tensor(2.0, device="meta")
+    metric(autograd.grad(loss, parameter))
+    assert metric.data.device == torch.device("meta")
