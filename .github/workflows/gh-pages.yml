@@ -7,6 +7,18 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      ref:
+        description: "ref to publish to gh-pages"
+        required: true
+        type: string
+
+  # Allows to be called by other workflows
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -18,7 +30,14 @@ jobs:
 
     steps:
       - name: Check out repository
+        if: github.event_name == 'release'
         uses: actions/checkout@v3
+
+      - name: Check out repository
+        if: github.event_name == 'workflow_call' || github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ inputs.ref }}"
 
       - name: Set up python
         id: setup-python
@@ -35,7 +54,7 @@ jobs:
       - name: Get poetry cache dir
         id: poetry-cache
         run: |
-          echo "::set-output name=dir::$(poetry config cache-dir)"
+          echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
 
       - name: Load cached venv
         id: cached-poetry-dependencies
@@ -45,7 +64,7 @@ jobs:
             ${{ steps.poetry-cache.outputs.dir }}
             .venv
             poetry.lock
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('pyproject.toml', 'poetry.lock') }}-ghpages
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'

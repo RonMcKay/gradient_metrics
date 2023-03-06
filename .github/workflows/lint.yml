@@ -2,14 +2,32 @@ name: Lint
 on:
   pull_request_target:
 
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
   workflow_dispatch:
+    inputs:
+      ref:
+        description: "ref to lint"
+        required: true
+        type: string
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
+        if: github.event_name == 'pull_request_target'
         uses: actions/checkout@v3
+
+      - name: Check out repository
+        if: github.event_name == 'workflow_call' || github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ inputs.ref }}"
 
       - name: Set up python
         id: setup-python
@@ -17,32 +35,37 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Update pip
-        run: python3 -m pip install --upgrade pip
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
-      - name: Get pip cache dir
-        id: pip-cache
+      - name: Get poetry cache dir
+        id: poetry-cache
         run: |
-          echo "::set-output name=dir::$(pip cache dir)"
+          echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
 
-      - name: pip cache
+      - name: Load cached venv
+        id: cached-poetry-dependencies
         uses: actions/cache@v3
         with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ steps.setup-python.outputs.python-version }}-linting
+          path: |
+            ${{ steps.poetry-cache.outputs.dir }}
+            .venv
+            poetry.lock
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('pyproject.toml', 'poetry.lock') }}-lint
 
-      - name: Install flake8, black and isort
-        run: python3 -m pip install flake8 black isort
+      - name: Install development dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --only=dev
 
       - name: Lint with flake8
         run: |
-          # stop the action if there are syntax errors or undefined variables
-          flake8 . --max-line-length=88 --extend-exclude=.venv,venv --select=E9,F63,F7,F82
-          # treat all errors as warnings
-          flake8 . --max-line-length=88 --extend-exclude=.venv,venv --count --exit-zero --max-complexity=10 --statistics
+          poetry run flake8 tests gradient_metrics --count --statistics
 
       - name: Check format with black
-        run: black gradient_metrics tests --check
+        run: poetry run black --check tests gradient_metrics
 
       - name: Check format with isort
-        run: isort --check --settings-path pyproject.toml gradient_metrics tests
+        run: poetry run isort --check --settings-path pyproject.toml tests gradient_metrics
