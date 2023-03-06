@@ -1,7 +1,8 @@
-from gradient_metrics import GradientMetricCollector
-from gradient_metrics.metrics import Max, Min, PNorm
 import torch
 import torch.nn as nn
+
+from gradient_metrics import GradientMetricCollector
+from gradient_metrics.metrics import Max, Min, PNorm
 
 
 # Define some model

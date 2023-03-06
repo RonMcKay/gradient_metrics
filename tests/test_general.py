@@ -1,11 +1,12 @@
 from pathlib import Path
 
-import gradient_metrics
-from gradient_metrics import GradientMetricCollector
-from gradient_metrics.metrics import Max, MeanStd, Min
 import pytest
 import toml
 import torch
+
+import gradient_metrics
+from gradient_metrics import GradientMetricCollector
+from gradient_metrics.metrics import Max, MeanStd, Min
 
 
 def test_versions_are_in_sync():

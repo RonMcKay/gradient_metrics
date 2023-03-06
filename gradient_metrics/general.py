@@ -1,8 +1,9 @@
 from typing import List, Sequence, Union
 
-from gradient_metrics.metrics import GradientMetric
 import torch
 import torch.nn as nn
+
+from gradient_metrics.metrics import GradientMetric
 
 
 class GradientMetricCollector(object):
