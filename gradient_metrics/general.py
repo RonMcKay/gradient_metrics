@@ -53,12 +53,14 @@ class GradientMetricCollector(object):
 
         self._params: List[torch.Tensor] = list(_params_set)
 
-    def __call__(self, loss: torch.Tensor) -> torch.Tensor:
+    def __call__(self, loss: torch.Tensor, retain_graph: bool = False) -> torch.Tensor:
         """Computes gradient metrics per sample.
 
         Args:
             loss (torch.Tensor): A loss tensor to compute the gradients on. This should
                 have a shape of ``(N,)`` with ``N`` being the number of samples.
+            retain_graph (bool): If True, retains the graph of the supplied loss.
+                Default False.
 
         Raises:
             ValueError: If the loss does not require a gradient
@@ -81,7 +83,7 @@ class GradientMetricCollector(object):
             gradients = torch.autograd.grad(
                 sample_loss,
                 self._params,
-                retain_graph=False if i == (len(loss) - 1) else True,
+                retain_graph=retain_graph if i == (len(loss) - 1) else True,
             )
 
             for param, grad in zip(self._params, gradients):
