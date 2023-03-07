@@ -65,6 +65,9 @@ def test_gradientmetriccollector():
 
     loss = (parameter * torch.full(((2, 3)), 1.0)).sum(1)
 
+    metrics = metric_collector(loss, retain_graph=True)
+
+    # We should be able to compute the gradient metrics again if we retain the graph
     metrics = metric_collector(loss)
 
     assert torch.all(metrics[0] == torch.tensor([1.0, 1.0, eps, 1.0]))
