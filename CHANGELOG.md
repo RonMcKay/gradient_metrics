@@ -6,11 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## 0.2.0 (2022-04-13)
 
-### BREAKING CHANGE
+### ❗️ BREAKING CHANGE
 
 - move `target_layers` option from `GradientMetricCollector` to `GradientMetric`s
 
-### Feat
+### 🚀 Features
 
 - improve flexibility of defining `GradientMetric`s
 - add `grad_transform` to `GradientMetric`s

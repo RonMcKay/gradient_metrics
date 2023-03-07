@@ -1,8 +1,9 @@
 import gc
 
-from gradient_metrics.metrics import GradientMetric, Max, Mean, MeanStd, Min, PNorm
 import pytest
 import torch
+
+from gradient_metrics.metrics import GradientMetric, Max, Mean, MeanStd, Min, PNorm
 
 
 def test_baseclass():
