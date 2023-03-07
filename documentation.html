@@ -28,14 +28,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> PyTorch Gradient Metrics
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PyTorch Gradient Metrics
           </a>
               <div class="version">
-                0.2.0
+                0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -72,8 +76,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Documentation</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Documentation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/documentation.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -89,7 +93,7 @@
 <h2>Gradient Metric Collector<a class="headerlink" href="#gradient-metric-collector" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="gradient_metrics.GradientMetricCollector">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gradient_metrics.</span></span><span class="sig-name descname"><span class="pre">GradientMetricCollector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#gradient_metrics.metrics.GradientMetric" title="gradient_metrics.metrics.GradientMetric"><span class="pre">gradient_metrics.metrics.GradientMetric</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#gradient_metrics.metrics.GradientMetric" title="gradient_metrics.metrics.GradientMetric"><span class="pre">gradient_metrics.metrics.GradientMetric</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradient_metrics.GradientMetricCollector" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gradient_metrics.</span></span><span class="sig-name descname"><span class="pre">GradientMetricCollector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#gradient_metrics.metrics.GradientMetric" title="gradient_metrics.metrics.GradientMetric"><span class="pre">gradient_metrics.metrics.GradientMetric</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#gradient_metrics.metrics.GradientMetric" title="gradient_metrics.metrics.GradientMetric"><span class="pre">gradient_metrics.metrics.GradientMetric</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradient_metrics.GradientMetricCollector" title="Permalink to this definition"></a></dt>
 <dd><p>Helper class for computing gradients.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -101,12 +105,16 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="gradient_metrics.GradientMetricCollector.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#gradient_metrics.GradientMetricCollector.__call__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retain_graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#gradient_metrics.GradientMetricCollector.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Computes gradient metrics per sample.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>loss</strong> (<em>torch.Tensor</em>) – A loss tensor to compute the gradients on. This should
-have a shape of <code class="docutils literal notranslate"><span class="pre">(N,)</span></code> with <code class="docutils literal notranslate"><span class="pre">N</span></code> being the number of samples.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loss</strong> (<em>torch.Tensor</em>) – A loss tensor to compute the gradients on. This should
+have a shape of <code class="docutils literal notranslate"><span class="pre">(N,)</span></code> with <code class="docutils literal notranslate"><span class="pre">N</span></code> being the number of samples.</p></li>
+<li><p><strong>retain_graph</strong> (<em>bool</em>) – If True, retains the graph of the supplied loss.
+Default False.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
@@ -161,11 +169,6 @@ gradient metrics and need to now the input shape per sample.</p>
 <dd><p>Resets all gradient metric instances to their default values.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="gradient_metrics.GradientMetricCollector.zero_grad">
-<span class="sig-name descname"><span class="pre">zero_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#gradient_metrics.GradientMetricCollector.zero_grad" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </section>
@@ -194,7 +197,7 @@ handed over to the <code class="docutils literal notranslate"><span class="pre">
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="gradient_metrics.metrics.GradientMetric.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#gradient_metrics.metrics.GradientMetric.__call__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#gradient_metrics.metrics.GradientMetric.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>A gradient metric instance is registered as a backward hook on parameters.
 This is going to be called when the associated parameter is part of a backward
 call.</p>
@@ -242,8 +245,8 @@ all sub classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gradient_metrics.metrics.GradientMetric._register">
-<span class="sig-name descname"><span class="pre">_register</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#gradient_metrics.metrics.GradientMetric._register" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="gradient_metrics.metrics.GradientMetric._register_parameters">
+<span class="sig-name descname"><span class="pre">_register_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#gradient_metrics.metrics.GradientMetric._register_parameters" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -478,7 +481,7 @@ handed over to the <code class="docutils literal notranslate"><span class="pre">
 <h3>PNorm<a class="headerlink" href="#pnorm" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="gradient_metrics.metrics.PNorm">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gradient_metrics.metrics.</span></span><span class="sig-name descname"><span class="pre">PNorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-16</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradient_metrics.metrics.PNorm" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gradient_metrics.metrics.</span></span><span class="sig-name descname"><span class="pre">PNorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gradient_metrics.metrics.PNorm" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gradient_metrics.metrics.GradientMetric" title="gradient_metrics.metrics.GradientMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">gradient_metrics.metrics.GradientMetric</span></code></a></p>
 <p>Computes the p-norm over the flattened gradients.</p>
 <div class="math notranslate nohighlight">
@@ -495,17 +498,11 @@ parameters of the Module.</p></li>
 <li><p><strong>grad_transform</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>torch.Tensor</em><em>]</em><em>, </em><em>torch.Tensor</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – A callable which accepts a <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> as input and returns a
 <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>. The callable is applied to the gradient before it is
 handed over to the <code class="docutils literal notranslate"><span class="pre">_collect</span></code> method of a <code class="docutils literal notranslate"><span class="pre">GradientMetric</span></code> instance.</p></li>
-<li><p><strong>p</strong> (<em>int</em><em>, </em><em>optional</em>) – Power of the norm. Defaults to 1 (absolute-value norm).</p></li>
-<li><p><strong>eps</strong> (<em>float</em><em>, </em><em>optional</em>) – Small epsilon for gradients with very small vector
-norms which would otherwise result in a possible division by zero in
-the second order derivatives. Defaults to 1e-16.</p></li>
+<li><p><strong>p</strong> (<em>float optional</em>) – Power of the norm. Defaults to 1 (absolute-value norm).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If p is smaller or equal to zero.</p></li>
-<li><p><strong>ValueError</strong> – If eps is smaller or equal to zero.</p></li>
-</ul>
+<dd class="field-even"><p><strong>ValueError</strong> – If p is not in the interval (0,inf].</p>
 </dd>
 </dl>
 <dl class="py property">
