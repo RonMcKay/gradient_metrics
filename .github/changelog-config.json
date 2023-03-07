@@ -25,6 +25,10 @@
             "labels": ["performance"]
         },
         {
+            "title": "### 🧪 Tests",
+            "labels": ["tests"]
+        },
+        {
             "title": "### ⚙️ CI/CD",
             "labels": ["ci-cd"]
         },
