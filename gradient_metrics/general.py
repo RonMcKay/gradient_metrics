@@ -93,7 +93,7 @@ class GradientMetricCollector(object):
             gradient_metrics.append(self.data)
             self.reset()
 
-        return torch.stack(gradient_metrics).to(loss.device)
+        return torch.stack(gradient_metrics)
 
     def reset(self) -> None:
         """Resets all gradient metric instances to their default values."""

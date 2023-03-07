@@ -92,3 +92,12 @@ def test_gradientmetriccollector():
     loss = linear_layer(torch.ones((1, 3))).sum(1)
     metrics = metric_collector(loss)
     assert torch.all(metrics[0] == torch.tensor([1.0, 1.0]))
+
+    # Test if the returned gradient metrics are on the same device as loss
+    parameter = torch.ones((3,), requires_grad=True, device="meta")
+    metric_collector = GradientMetricCollector(
+        metrics=[Max(parameter), MeanStd(parameter, eps=eps), Min(parameter)]
+    )
+    loss = (parameter * torch.full(((2, 3)), 1.0, device=parameter.device)).sum(1)
+    metrics = metric_collector(loss)
+    assert loss.device == metrics.device
