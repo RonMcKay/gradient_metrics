@@ -29,7 +29,13 @@ def test_gradientmetriccollector_inputs():
     eps = 1e-16
 
     with pytest.raises(ValueError):
-        metric_collector = GradientMetricCollector(metrics=[])
+        GradientMetricCollector(metrics=[])
+
+    with pytest.raises(ValueError):
+        GradientMetricCollector(metrics=(Max(parameter),))
+
+    with pytest.raises(ValueError):
+        GradientMetricCollector(metrics=[Max(parameter), "test"])
 
     metric_collector = GradientMetricCollector(
         metrics=[Max(parameter), MeanStd(parameter, eps=eps), Min(parameter)]
@@ -51,11 +57,17 @@ def test_gradientmetriccollector():
         metrics=[Max(parameter), MeanStd(parameter, eps=eps), Min(parameter)]
     )
 
-    # target layers should only contain the parameter defined above once
-    assert len(metric_collector.target_layers) == 1
+    # _params should only contain the parameter defined above once
+    assert len(metric_collector._params) == 1
+
+    # parameter should have three metrics assigned
+    assert len(metric_collector._param_metrics_map[parameter]) == 3
 
     loss = (parameter * torch.full(((2, 3)), 1.0)).sum(1)
 
+    metrics = metric_collector(loss, retain_graph=True)
+
+    # We should be able to compute the gradient metrics again if we retain the graph
     metrics = metric_collector(loss)
 
     assert torch.all(metrics[0] == torch.tensor([1.0, 1.0, eps, 1.0]))
@@ -80,3 +92,12 @@ def test_gradientmetriccollector():
     loss = linear_layer(torch.ones((1, 3))).sum(1)
     metrics = metric_collector(loss)
     assert torch.all(metrics[0] == torch.tensor([1.0, 1.0]))
+
+    # Test if the returned gradient metrics are on the same device as loss
+    parameter = torch.ones((3,), requires_grad=True, device="meta")
+    metric_collector = GradientMetricCollector(
+        metrics=[Max(parameter), MeanStd(parameter, eps=eps), Min(parameter)]
+    )
+    loss = (parameter * torch.full(((2, 3)), 1.0, device=parameter.device)).sum(1)
+    metrics = metric_collector(loss)
+    assert loss.device == metrics.device

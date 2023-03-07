@@ -85,7 +85,7 @@ if __name__ == "__main__":
     loss = crit(out, y_pred)
 
     # gather gradient metrics
-    grad_metrics = mcollector(loss)
+    grad_metrics = mcollector(loss, retain_graph=True)
 
     # We will get an output shape of (10, 9)
     # 3 metrics over the whole network parameters

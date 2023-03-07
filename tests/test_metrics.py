@@ -2,6 +2,7 @@ import gc
 
 import pytest
 import torch
+from torch import autograd
 
 from gradient_metrics.metrics import GradientMetric, Max, Mean, MeanStd, Min, PNorm
 
@@ -42,20 +43,20 @@ def test_max():
     metric = Max(parameter)
 
     loss = parameter * torch.ones((1,))
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(1.0)
 
     loss = parameter * torch.tensor(0.5)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(1.0)
 
     loss = parameter * torch.tensor(2.0)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(2.0)
 
     metric = Max(parameter, grad_transform=lambda grad: torch.tensor(-1.0))
     loss = parameter * torch.tensor(2.0)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(-1.0)
 
     parameter = torch.ones((1,), requires_grad=True, device="meta")
@@ -70,25 +71,25 @@ def test_min():
     metric = Min(parameter)
 
     loss = parameter * torch.ones((1,))
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(1.0)
 
     loss = parameter * torch.tensor(2.0)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(1.0)
 
     metric.reset()
     loss = parameter * torch.tensor(2.0)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(2.0)
 
     loss = parameter * torch.tensor(0.0)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(0.0)
 
     metric = Min(parameter, grad_transform=lambda grad: torch.tensor(100.0))
     loss = parameter * torch.tensor(0.0)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(100.0)
 
     parameter = torch.ones((1,), requires_grad=True, device="meta")
@@ -103,27 +104,27 @@ def test_pnorm():
     metric = PNorm(parameter)
 
     loss = (parameter * torch.ones_like(parameter)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(3.0)
 
     metric = PNorm(parameter, grad_transform=lambda grad: torch.tensor(100.0))
     loss = (parameter * torch.tensor(0.0)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(100.0)
 
     metric = PNorm(parameter, p=float("inf"))
     loss = (parameter * torch.tensor(-2.0)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(2.0)
 
     metric = PNorm(parameter, p=float("inf"))
     loss = (parameter * torch.tensor(2.0)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(2.0)
 
     metric = PNorm(parameter, grad_transform=lambda grad: torch.tensor([100, 100]), p=2)
     loss = (parameter * torch.tensor(1.0)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(20000**0.5)
 
     parameter = torch.ones((3,), requires_grad=True, device="meta")
@@ -138,21 +139,21 @@ def test_mean():
     metric = Mean(parameter)
 
     loss = (parameter * torch.ones_like(parameter)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(1.0)
 
     loss = (parameter * torch.tensor([-1.0, 0.0, 1.0])).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(0.5)
     metric.reset()
 
     loss = (parameter * torch.tensor([-1.0, 0.0, 1.0])).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(0.0)
 
     metric = Mean(parameter, grad_transform=lambda grad: torch.tensor(1))
     loss = (parameter * torch.tensor(0.0)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(1)
 
     parameter = torch.ones((3,), requires_grad=True, device="meta")
@@ -168,7 +169,7 @@ def test_meanstd():
     metric = MeanStd(parameter, eps=eps)
 
     loss = (parameter * torch.ones_like(parameter)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert torch.all(metric.data == torch.tensor([1.0, eps]))
     metric.reset()
     del metric
@@ -178,7 +179,7 @@ def test_meanstd():
     metric = MeanStd(parameter, eps=eps)
 
     loss = parameter * torch.tensor(0.0)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert torch.all(metric.data == torch.tensor([0.0, eps]))
     del metric
     gc.collect()
@@ -186,12 +187,12 @@ def test_meanstd():
     metric = MeanStd(parameter, return_mean=False, eps=eps)
 
     loss = parameter * torch.tensor(2.0)
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert metric.data == torch.tensor(eps)
 
     metric = MeanStd(parameter, grad_transform=lambda grad: torch.tensor(1))
     loss = (parameter * torch.tensor(0.0)).sum()
-    loss.backward()
+    metric(autograd.grad(loss, parameter))
     assert torch.all(metric.data == torch.tensor([1, eps]))
 
     parameter = torch.ones((1,), requires_grad=True, device="meta")

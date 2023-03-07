@@ -2,7 +2,6 @@ from typing import Callable, List, Optional, Sequence, Union
 
 import torch
 import torch.nn as nn
-from torch.utils.hooks import RemovableHandle
 
 
 class GradientMetric(object):
@@ -27,16 +26,18 @@ class GradientMetric(object):
                 ``torch.Tensor``. The callable is applied to the gradient before it is
                 handed over to the ``_collect`` method of a ``GradientMetric`` instance.
         """
-        self.hook_handles: List[RemovableHandle] = []
         self.target_layers = (
             (target_layers,)
             if isinstance(target_layers, (nn.Module, torch.Tensor))
             else tuple(target_layers)
         )
+        self.target_parameters: List[
+            Union[torch.Tensor, torch.nn.parameter.Parameter]
+        ] = []
         self.grad_transform = grad_transform
-        self._register()
+        self._register_parameters()
 
-    def __call__(self, grad: torch.Tensor) -> None:
+    def __call__(self, grad: Union[Sequence[torch.Tensor], torch.Tensor]) -> None:
         """A gradient metric instance is registered as a backward hook on parameters.
         This is going to be called when the associated parameter is part of a backward
         call.
@@ -45,13 +46,18 @@ class GradientMetric(object):
             grad (torch.Tensor): The gradient of the associated parameter. On this the
                 metric is going to be computed.
         """
-        if self.grad_transform is not None:
-            grad = self.grad_transform(grad)
-        self._collect(grad)
 
-    def __del__(self) -> None:
-        for hook in self.hook_handles:
-            hook.remove()
+        # Make sure to not modify the gradient as it may be used by
+        # other processes also. So just clone it for now.
+        if isinstance(grad, torch.Tensor):
+            internal_grad = [grad.detach()]
+        else:
+            internal_grad = [t.detach() for t in grad]
+
+        for g in internal_grad:
+            if self.grad_transform is not None:
+                g = self.grad_transform(g)
+            self._collect(g)
 
     def _collect(self, grad: torch.Tensor) -> None:
         """This method has to be implemented by every GradientMetric subclass.
@@ -97,13 +103,13 @@ class GradientMetric(object):
         """
         raise NotImplementedError
 
-    def _register(self) -> None:
+    def _register_parameters(self) -> None:
         for t in self.target_layers:
             if isinstance(t, torch.Tensor):
-                self.hook_handles.append(t.register_hook(self))
+                self.target_parameters.append(t)
             else:
                 for param in t.parameters():
-                    self.hook_handles.append(param.register_hook(self))
+                    self.target_parameters.append(param)
 
 
 class PNorm(GradientMetric):
