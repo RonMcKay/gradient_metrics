@@ -159,7 +159,9 @@ jobs:
     secrets: inherit
 
   publish-to-gh-pages:
+    needs: create-release
     if: ${{ inputs.publish-gh-pages }}
     uses: RonMcKay/gradient_metrics/.github/workflows/gh-pages.yml@main
     with:
-      ref: "${{ github.sha }}"
+      ref: "v${{ needs.create-release.outputs.new_version }}"
+    secrets: inherit
