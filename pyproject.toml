@@ -16,7 +16,7 @@ documentation = "https://ronmckay.github.io/gradient_metrics/"
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
 numpy = "^1.21.1"
-torch = ">=1.4.0,~2"
+torch = "2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
