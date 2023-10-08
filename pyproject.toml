@@ -14,15 +14,15 @@ authors = ["Philipp Oberdiek <git@oberdiek.net>"]
 documentation = "https://ronmckay.github.io/gradient_metrics/"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.11"
+python = ">=3.8,<3.11"
 numpy = "^1.21.1"
-torch = "^1.4.0"
+torch = ">=1.4.0,~2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.10.0"
+black = "^23.9.1"
 flake8 = "^5.0.4"
 isort = "^5"
-mypy = "^0.982"
+mypy = "^1.5.1"
 pytest = "^7.2.0"
 pytest-cov = {extras = ["toml"], version = "^4.0.0"}
 sphinx = "^4.3.2"
