@@ -43,6 +43,9 @@ jobs:
     if: ${{ startsWith(github.ref_name, 'release/') || github.ref_name == 'main' }}
     outputs:
       new_version: ${{ steps.bump_version.outputs.version }}
+    # Do not run multiple runs of this workflow in parallel on the same ref
+    concurrency:
+      group: release-${{ github.ref }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v3

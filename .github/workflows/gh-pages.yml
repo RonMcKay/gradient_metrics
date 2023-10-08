@@ -22,7 +22,7 @@ jobs:
 
     # Do not run multiple runs of this workflow in parallel on the same ref
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: gh-pages-${{ github.ref }}
 
     steps:
       - name: Check out repository

@@ -21,7 +21,7 @@ jobs:
 
     # Do not run multiple runs of this workflow in parallel on the same ref
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: publish-testpypi-${{ github.ref }}
 
     steps:
       - name: Check out repository
