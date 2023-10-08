@@ -14,7 +14,7 @@ authors = ["Philipp Oberdiek <git@oberdiek.net>"]
 documentation = "https://ronmckay.github.io/gradient_metrics/"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.11"
+python = ">=3.8,<3.12"
 numpy = "^1.21.1"
 torch = "2.0.0"
 
