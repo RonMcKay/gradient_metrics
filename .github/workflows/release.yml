@@ -4,6 +4,9 @@ permissions:
   contents: write
   pull-requests: write
 
+env:
+  Timezone: "Etc/UTC"
+
 on:
   workflow_dispatch:
     inputs:
@@ -11,8 +14,9 @@ on:
         description: 'Semver increment. Leave empty for automatic detection'
         required: false
         type: choice
+        default: 'AUTO'
         options:
-        - ''
+        - 'AUTO'
         - 'PATCH'
         - 'MINOR'
         - 'MAJOR'
@@ -20,7 +24,7 @@ on:
         description: 'Should this new version be published to GitHub-Pages?'
         required: false
         type: boolean
-        default: false
+        default: true
 
 jobs:
   lint:
@@ -43,7 +47,7 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
 
       - name: Set up python
         id: setup-python
@@ -78,8 +82,7 @@ jobs:
           owner: "RonMcKay"
           repo: "gradient_metrics"
           toTag: ${{ github.sha }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # Save changelog to file and remove trailing newlines
       - name: "Save changelog changes to file"
@@ -87,14 +90,14 @@ jobs:
 
       # Detect increment
       - name: Detect increment
-        if: inputs.increment == ''
+        if: inputs.increment == 'AUTO'
         id: detect_increment
         run: echo "increment=$(.github/detect-increment.sh tmp-changelog.md)" >> $GITHUB_OUTPUT
 
       - name: Register correct increment
         id: set_increment
         run: |
-          if [  -z "${{ inputs.increment }}" ]; then
+          if [ "${{ inputs.increment }}" == "AUTO" ]; then
             echo "increment=${{ steps.detect_increment.outputs.increment }}" >> $GITHUB_OUTPUT
           else
             echo "increment=${{ inputs.increment }}" >> $GITHUB_OUTPUT
@@ -128,14 +131,18 @@ jobs:
           git tag -a -m "v${{ steps.bump_version.outputs.version }}" v${{ steps.bump_version.outputs.version }}
           git push origin --follow-tags
 
-      - name: "Create release"
-        run: GH_TOKEN=${{ github.token }} gh release create v${{ steps.bump_version.outputs.version }} --notes-file tmp-changelog.md --title v${{ steps.bump_version.outputs.version }}
+      - name: "Create release from new tag"
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.bump_version.outputs.version }}
+          body_path: ${{ github.workspace }}/tmp-changelog.md
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # Only create pull request if the release branch was not already existing
       # as in the case of a hotfix e.g.
       - name: "Create Pull Request into main"
         if: ${{ !startsWith(github.ref_name, 'release/') }}
-        run: GH_TOKEN=${{ github.token }} gh pr create --base "main" --head "${{ steps.release_branch.outputs.name }}" --title "Changelog v${{ steps.bump_version.outputs.version }}" --body-file "tmp-changelog.md"
+        run: GH_TOKEN=${{ github.token }} gh pr create --assignee "RonMcKay" --base "main" --head "${{ steps.release_branch.outputs.name }}" --title "Changelog v${{ steps.bump_version.outputs.version }}" --body-file "tmp-changelog.md"
 
   publish-to-testpypi:
     needs: create-release
