@@ -25,9 +25,8 @@ If applicable, add screenshots to help explain your problem.
 
 **Versions:**
  - Python: [e.g. 3.9]
- - gradient-metrics [e.g. 0.2.0]
- - PyTorch [e.g. 1.13.0]
- - numpy [e.g. 1.21.1]
+ - gradient-metrics [e.g. 0.4.0]
+ - PyTorch [e.g. 2.0.0]
 
 **Additional context**
 Add any other context about the problem here.
