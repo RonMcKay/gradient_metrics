@@ -28,6 +28,9 @@
             "title": "### 🧪 Tests",
             "labels": ["tests"]
         },
+        {   "title": "### 🔨 Build",
+            "labels": ["build"]
+        },
         {
             "title": "### ⚙️ CI/CD",
             "labels": ["ci-cd"]
