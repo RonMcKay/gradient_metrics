@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "gradient_metrics"
-version = "0.4.0"
+version = "0.5.0"
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/RonMcKay/gradient_metrics"
@@ -62,7 +62,7 @@ line_length = 88
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.4.0"
+version = "0.5.0"
 tag_format = "v$version"
 major_version_zero = true
 version_files = [
